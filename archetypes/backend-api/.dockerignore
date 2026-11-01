@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+dist
+coverage
+.git
+.gitignore
+.env
+.env.*.local
+.husky
+.kiro
+.cline
+.continue
+.github
+tests
+__tests__
+*.md
