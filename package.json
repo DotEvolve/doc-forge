@@ -1,11 +1,13 @@
 {
-  "name": "@dotevolve/{{LIB_NAME}}",
+  "name": "@dotevolve/docForge",
   "version": "0.1.0",
   "description": "DotEvolve shared library",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -21,8 +23,12 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "react-dom": { "optional": true }
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "husky": "^9.1.7",
@@ -34,7 +40,15 @@
     "vitest": "^5.0.5"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": ["prettier --write"],
-    "*.{json,css,scss,md,yml,yaml}": ["prettier --write"]
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.{json,css,scss,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true,
+    "esbuild@0.27.2": true
   }
 }
