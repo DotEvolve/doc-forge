@@ -1,0 +1,78 @@
+{
+  "slug": "job-slip",
+  "name": "Job Slip (A5-in-A4)",
+  "version": 1,
+  "page": {
+    "size": "A4",
+    "orientation": "portrait",
+    "margins": {
+      "top": 10,
+      "right": 10,
+      "bottom": 10,
+      "left": 18
+    },
+    "slipsPerSheet": 2,
+    "showCutLine": true,
+    "cutLineText": "CUT HERE"
+  },
+  "styles": {
+    "primaryColor": "#000000",
+    "accentColor": "#1e293b",
+    "headerBgColor": "#e5e7eb",
+    "zebraBgColor": "#f7f7f7",
+    "fontFamily": "Arial, Helvetica, sans-serif",
+    "fontSizePt": 11,
+    "lineHeight": 1.25,
+    "compact": true
+  },
+  "sections": [
+    {
+      "id": "sec-header",
+      "type": "header",
+      "visible": true,
+      "showTenantName": true,
+      "showTitle": true,
+      "showDocumentNumber": true,
+      "documentNumberLabel": "Job #",
+      "showDate": true,
+      "dateLabel": "Date",
+      "showBorder": true
+    },
+    {
+      "id": "sec-steps-table",
+      "type": "table",
+      "visible": true,
+      "tableKey": "steps",
+      "showBorder": true,
+      "zebraStriping": true,
+      "repeatHeaderOnPageBreak": true
+    },
+    {
+      "id": "sec-global-attrs-table",
+      "type": "table",
+      "visible": true,
+      "tableKey": "globalAttributes",
+      "showBorder": true,
+      "zebraStriping": false,
+      "repeatHeaderOnPageBreak": true
+    },
+    {
+      "id": "sec-sizes-table",
+      "type": "table",
+      "visible": true,
+      "tableKey": "sizes",
+      "showBorder": true,
+      "zebraStriping": true,
+      "repeatHeaderOnPageBreak": true,
+      "suppressDuplicates": true,
+      "groupKey": "article"
+    },
+    {
+      "id": "sec-footer",
+      "type": "footer",
+      "visible": true,
+      "showPageNumbers": false,
+      "showPrintedDate": false
+    }
+  ]
+}

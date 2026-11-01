@@ -1,0 +1,61 @@
+{
+  "slug": "articles-report",
+  "name": "Articles Report (A4 Portrait)",
+  "version": 1,
+  "page": {
+    "size": "A4",
+    "orientation": "portrait",
+    "margins": {
+      "top": 10,
+      "right": 10,
+      "bottom": 10,
+      "left": 18
+    },
+    "slipsPerSheet": 1,
+    "showCutLine": false
+  },
+  "styles": {
+    "primaryColor": "#0f172a",
+    "accentColor": "#4f46e5",
+    "headerBgColor": "#f8fafc",
+    "zebraBgColor": "#f1f5f9",
+    "fontFamily": "Inter, -apple-system, sans-serif",
+    "fontSizePt": 9,
+    "lineHeight": 1.3,
+    "headingFontWeight": "700",
+    "subheadingFontWeight": "600",
+    "bodyFontWeight": "400",
+    "headerFontSizePt": 14,
+    "tableFontSizePt": 8,
+    "metaFontSizePt": 8,
+    "cellPadding": "normal"
+  },
+  "sections": [
+    {
+      "id": "sec-header",
+      "type": "header",
+      "visible": true,
+      "showTenantName": true,
+      "showTitle": true,
+      "showDocumentNumber": false,
+      "showDate": true,
+      "showBorder": true
+    },
+    {
+      "id": "sec-articles-table",
+      "type": "table",
+      "visible": true,
+      "tableKey": "articles",
+      "showBorder": true,
+      "zebraStriping": true,
+      "repeatHeaderOnPageBreak": true
+    },
+    {
+      "id": "sec-footer",
+      "type": "footer",
+      "visible": true,
+      "showPageNumbers": true,
+      "showPrintedDate": true
+    }
+  ]
+}

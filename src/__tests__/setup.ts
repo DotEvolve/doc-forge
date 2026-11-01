@@ -1,1 +1,1 @@
-// Shared test setup for library
+import '@testing-library/jest-dom';

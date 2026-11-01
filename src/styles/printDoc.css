@@ -1,0 +1,557 @@
+/* =====================================================================
+   Shared print document styles
+   ---------------------------------------------------------------------
+   Every printable target (reports, worker ledger, job slips) renders a
+   <PrintDocument>/<PrintTable> (src/components/global/PrintDocument.tsx)
+   styled by the `.print-doc` classes below, so all generated PDFs share
+   one look. Page size and orientation are set per target through
+   buildPrintPageStyle() in src/utils/print.ts.
+
+   Never add an `@page` rule to this file: react-to-print copies global
+   stylesheets into the print iframe AFTER the per-report pageStyle, so a
+   global @page would override the chosen orientation.
+   ===================================================================== */
+.print-doc {
+  /* Hard millimetre cap on the printed width.
+     `@page` margins are not honoured everywhere — a browser print dialog whose
+     Margins setting is not "Default" overrides them, and the content then gets
+     laid out against the full paper width and runs off the right edge. Capping
+     the document at the A4 content width (paper - 18mm left - 10mm right)
+     makes that overflow impossible regardless of how the margins are resolved.
+     Keep these in step with PRINT_PAGE_MARGIN in src/utils/print.ts. */
+  width: 100%;
+  max-width: var(--report-content-width-portrait-mm, var(--report-content-width-mm, 182mm));
+  box-sizing: border-box;
+  color: var(--report-primary-color, #000);
+  background: #fff;
+  font-family: var(--report-font-family, Arial, Helvetica, sans-serif);
+  font-size: var(--report-font-size, 12pt);
+  font-weight: var(--report-font-weight, 400);
+  line-height: var(--report-line-height, 1.35);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.print-doc--portrait {
+  max-width: var(--report-content-width-portrait-mm, var(--report-content-width-mm, 182mm));
+}
+
+.print-doc p,
+.print-doc dl,
+.print-doc dt,
+.print-doc dd {
+  margin: 0;
+}
+
+/* ----- Header ----- */
+.print-doc__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #000;
+}
+
+.print-doc__tenant {
+  font-size: var(
+    --doc-header-font-size,
+    var(--report-header-font-size, calc(var(--report-font-size, 12pt) * 1.15))
+  );
+  font-weight: var(--doc-heading-font-weight, var(--report-heading-font-weight, 700));
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.print-doc__title {
+  font-size: var(
+    --doc-header-font-size,
+    var(--report-header-font-size, var(--report-font-size, 12pt))
+  );
+  font-weight: var(--doc-heading-font-weight, var(--report-heading-font-weight, 600));
+  margin-top: 2px;
+}
+
+.print-doc__subtitle {
+  font-size: var(--doc-subheading-font-size, var(--report-subheading-font-size, 10pt));
+  font-weight: var(--doc-subheading-font-weight, var(--report-subheading-font-weight, 500));
+  color: #000;
+  margin-top: 2px;
+}
+
+.print-doc__printed {
+  text-align: right;
+  font-size: 12pt;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+}
+
+.print-doc__printed p:last-child {
+  font-weight: 800;
+  color: #000;
+}
+
+/* ----- Meta (period, filters, counts) ----- */
+.print-doc__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-bottom: 8px;
+  font-size: 12pt;
+  font-weight: 700;
+}
+
+.print-doc__meta-item {
+  display: flex;
+  gap: 4px;
+}
+
+.print-doc__meta-item dt {
+  font-weight: 700;
+}
+
+.print-doc__meta-item dt::after {
+  content: ':';
+}
+
+/* ----- Summary boxes ----- */
+.print-doc__summary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.print-doc__summary-item {
+  flex: 1 1 0;
+  border: 1px solid #000;
+  padding: 5px 8px;
+  text-align: center;
+}
+
+.print-doc__summary-label {
+  font-size: 12pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.print-doc__summary-value {
+  font-size: 14pt;
+  font-weight: 800;
+}
+
+/* ----- Table -----
+   Resets the app-wide `table`/`tr`/`th`/`td` screen rules (grid rows,
+   shadows, 4rem heights) so a real table is printed. `table-layout: fixed`
+   guarantees the table never grows past the sheet width; long values wrap. */
+.print-doc__table {
+  width: 100%;
+  /* `separate` (not `collapse`) is deliberate: with collapsed borders Chrome
+     paints the border of a row it pushes to the next sheet on the previous one,
+     leaving an empty bordered stub at the foot of the page. Each line below is
+     therefore owned by a cell. Do not switch this back to `collapse`. */
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  box-shadow: none;
+  background: transparent;
+  font-size: var(--doc-table-font-size, var(--report-table-font-size, 10pt));
+  margin-bottom: 8px;
+}
+
+.print-doc__table--auto {
+  table-layout: auto !important;
+}
+
+.print-doc__table thead {
+  display: table-header-group;
+  box-shadow: none;
+}
+
+/* `table-row-group`, not `table-footer-group`: the latter makes Chrome repeat
+   the totals row on every printed page, which reads as if the report ended. */
+.print-doc__table tfoot {
+  display: table-row-group;
+}
+
+/* A row must never be split across sheets — it starts on the next page
+   instead. `break-inside` is declared on the row AND its cells because Chrome
+   honours the row rule only when no descendant re-enables breaking. */
+.print-doc__table tr {
+  display: table-row;
+  grid-template-columns: none;
+  height: auto;
+  width: auto;
+  background: transparent;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.print-doc__table tbody tr:hover {
+  background: transparent;
+}
+
+/* Each cell draws its right and bottom edge; the first cell of a row draws the
+   left edge and the first row draws the top edge. That yields single-width
+   gridlines with no doubling, exactly like `border-collapse: collapse`. */
+.print-doc__table th,
+.print-doc__table td {
+  display: table-cell;
+  border: 1.5px solid #000;
+  border-top-style: none;
+  border-left-style: none;
+  padding: var(--report-cell-padding, 3px 5px);
+  vertical-align: top;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  text-align: left;
+  color: #000;
+  font-weight: var(--report-font-weight, 700);
+  font-size: var(--doc-table-font-size, var(--report-table-font-size, inherit));
+  letter-spacing: normal;
+  text-transform: none;
+  /* `break-word`, not `anywhere`: wrap at spaces first and only break inside a
+     word that cannot fit on its own, so "Genuine Leather" stays readable. */
+  overflow-wrap: break-word;
+}
+
+.print-doc__table tr > th:first-child,
+.print-doc__table tr > td:first-child {
+  border-left-style: solid;
+}
+
+.print-doc__table > thead > tr:first-child > th,
+.print-doc__table > thead > tr:first-child > td,
+.print-doc__table > tbody:first-child > tr:first-child > th,
+.print-doc__table > tbody:first-child > tr:first-child > td {
+  border-top-style: solid;
+}
+
+.print-doc__table thead th {
+  background: var(--report-header-bg, #e5e7eb);
+  font-weight: var(--report-font-weight, 800);
+  /* Headers are set bolder for clarity */
+  font-size: 10pt;
+  padding-left: 3px;
+  padding-right: 3px;
+  text-transform: uppercase;
+  vertical-align: bottom;
+}
+
+.print-doc__table tbody tr:nth-child(even) td {
+  background: var(--report-zebra-bg, #f7f7f7);
+}
+
+.print-doc__table tfoot td {
+  background: var(--report-header-bg, #e5e7eb);
+  font-weight: var(--report-font-weight, 700);
+}
+
+/* Numeric columns: a quantity must never be split across lines ("18" becoming
+   "1" over "8"), so centred and right-aligned cells never wrap mid-number. */
+.print-doc__cell--center {
+  text-align: center !important;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.print-doc__cell--right {
+  text-align: right !important;
+}
+
+.print-doc__table th.print-doc__qty,
+.print-doc__table td.print-doc__qty,
+.print-doc__table th.print-doc__cell--numeric,
+.print-doc__table td.print-doc__cell--numeric,
+.print-doc__cell--numeric,
+.print-doc__qty {
+  font-size: var(--doc-qty-font-size, var(--report-qty-font-size, inherit));
+  font-weight: var(--doc-qty-font-weight, var(--report-qty-font-weight, 700));
+}
+
+.print-doc--slip .print-doc__cell--right {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.print-doc__empty {
+  text-align: center !important;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 12pt;
+  color: #000;
+  padding: 10px !important;
+}
+
+.print-doc__muted {
+  color: #555;
+  font-size: 10pt;
+}
+
+.print-doc__strong {
+  font-weight: var(--report-subheading-font-weight, var(--report-font-weight, 800));
+}
+
+.print-doc__nowrap {
+  white-space: nowrap;
+}
+
+.print-doc__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.print-doc__note {
+  font-size: 10pt;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* A4 landscape content width: 297mm - 18mm left - 10mm right. */
+.print-doc--landscape {
+  max-width: var(--report-content-width-landscape-mm, var(--report-content-width-mm, 269mm));
+}
+
+/* Landscape documents carry many dynamic columns: tighten type and padding. */
+.print-doc--landscape .print-doc__table {
+  font-size: var(--doc-table-font-size, var(--report-table-font-size, 12pt));
+}
+
+.print-doc--landscape .print-doc__table th,
+.print-doc--landscape .print-doc__table td {
+  padding: 2px 4px;
+}
+
+/* ----- Job slips -----
+   Two slips share one A4 portrait sheet, each occupying half its height, so a
+   slip is effectively A5 landscape and the sheet is cut across the middle.
+   Type is heavier than the reports so floor workers can read a slip at a
+   glance, but smaller than the old landscape slip because the portrait sheet
+   with a 1in left margin is narrower. */
+.print-doc--slip .print-doc__table {
+  font-size: var(--report-table-font-size, var(--report-font-size, 11pt));
+  margin-bottom: 4px;
+}
+
+.print-doc--slip .print-doc__table th,
+.print-doc--slip .print-doc__table td {
+  border-width: 1.2px;
+  padding: var(--report-cell-padding, 2px 4px);
+  vertical-align: middle;
+}
+
+.print-doc--slip .print-doc__table thead th {
+  font-size: var(--report-table-font-size, var(--report-font-size, 11pt));
+  font-weight: var(--report-subheading-font-weight, var(--report-font-weight, 700));
+}
+
+/* The per-size quantities are what the floor actually works from, so they are
+   set noticeably larger and bolder than the rest of the slip. Horizontal padding
+   is tightened to leave the width to the digits. */
+.print-doc--slip .print-doc__qty {
+  font-size: var(--doc-qty-font-size, var(--report-qty-font-size, 12pt));
+  font-weight: var(
+    --doc-qty-font-weight,
+    var(--report-qty-font-weight, var(--report-body-font-weight, var(--report-font-weight, 700)))
+  );
+  padding-left: 2px;
+  padding-right: 2px;
+  letter-spacing: -0.01em;
+}
+
+.print-doc--slip .print-doc__table thead th.print-doc__qty {
+  font-size: var(--doc-qty-font-size, var(--report-qty-font-size, 12pt));
+  font-weight: var(
+    --doc-qty-font-weight,
+    var(
+      --report-qty-font-weight,
+      var(--report-subheading-font-weight, var(--report-font-weight, 700))
+    )
+  );
+}
+
+/* Applied by JobSlipSheet when the tenant's size range exceeds 12 columns. */
+.print-doc--slip-dense .print-doc__table {
+  font-size: var(--doc-table-font-size, var(--report-table-font-size, 10pt));
+}
+
+.print-doc--slip-dense .print-doc__table th,
+.print-doc--slip-dense .print-doc__table td {
+  padding: var(--report-cell-padding, 2px 3px);
+}
+
+.print-doc--slip-dense .print-doc__table thead th {
+  font-size: var(--doc-table-font-size, var(--report-table-font-size, 7pt));
+}
+
+.print-doc--slip-dense .print-doc__qty {
+  font-size: var(--doc-qty-font-size, var(--report-qty-font-size, 10pt));
+  font-weight: var(
+    --doc-qty-font-weight,
+    var(--report-qty-font-weight, var(--report-body-font-weight, var(--report-font-weight, 700)))
+  );
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+.print-doc--slip-dense .print-doc__table thead th.print-doc__qty {
+  font-size: var(--doc-qty-font-size, var(--report-qty-font-size, 8.5pt));
+  font-weight: var(
+    --doc-qty-font-weight,
+    var(
+      --report-qty-font-weight,
+      var(--report-subheading-font-weight, var(--report-font-weight, 700))
+    )
+  );
+}
+
+.print-doc--slip .print-doc__table tbody tr:nth-child(even) td {
+  background: transparent;
+}
+
+.print-doc__slip {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.print-doc__slip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 3px;
+}
+
+.print-doc__slip-title {
+  font-size: var(--report-header-font-size, 11pt);
+  font-weight: var(--report-heading-font-weight, var(--report-font-weight, 800));
+  text-transform: uppercase;
+}
+
+.print-doc__slip-meta {
+  font-size: var(--report-meta-font-size, 8.5pt);
+  font-weight: var(--report-subheading-font-weight, var(--report-font-weight, 700));
+  white-space: nowrap;
+}
+
+.print-doc__slip-cut {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 7.5pt;
+}
+
+.print-doc__slip-cut::before,
+.print-doc__slip-cut::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dashed #777;
+}
+
+/* On screen the dialog shows the slips as a compact preview; only the printed
+   sheet is divided into halves. */
+.print-doc__slip + .print-doc__slip {
+  margin-top: 14px;
+}
+
+@media print {
+  /* These resets live in the print stylesheet on purpose. react-to-print
+     copies it into the print iframe AFTER the per-report `pageStyle`, so this is
+     the only place that reliably beats whatever the app sets on `body`.
+     `width: auto` lets each box fill the page area exactly, which keeps the
+     table inside the sheet even if an ancestor carries a viewport or pixel
+     width (a `100vw` ancestor is what pushes content past the right margin). */
+  html,
+  body {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-doc {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .print-doc__table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .print-doc__table--auto {
+    table-layout: auto !important;
+  }
+
+  /* Nothing inside a printed document may establish its own wider box. */
+  .print-doc * {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Half of the 277mm printable height of an A4 portrait sheet, less the cut
+     divider. `min-height` (not `height`) keeps the cut line on the midpoint for
+     normal slips while letting an unusually long slip take the whole sheet
+     rather than being clipped. */
+  .print-doc--slip .print-doc__slip {
+    min-height: var(--report-slip-min-height-mm, 133mm);
+    box-sizing: border-box;
+    margin-top: 0;
+  }
+
+  /* Exactly two slips per sheet. `:not(:last-of-type)` avoids a trailing blank
+     page when the slip count is even. */
+  .print-doc--slip .print-doc__slip:nth-of-type(2n):not(:last-of-type) {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  /* Single slip per sheet (Full A4): occupies full sheet height with 4mm safety tolerance
+     to prevent subpixel rounding or browser print margins from creating extra blank pages. */
+  .print-doc--slip.print-doc--slip-single .print-doc__slip,
+  .print-doc--slip-single .print-doc__slip {
+    min-height: var(
+      --report-single-slip-min-height-mm,
+      calc(var(--report-content-height-mm, 277mm) - 4mm)
+    );
+    box-sizing: border-box;
+    margin-top: 0;
+  }
+
+  .print-doc--slip.print-doc--slip-single .print-doc__slip:not(:last-of-type),
+  .print-doc--slip-single .print-doc__slip:not(:last-of-type) {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .break-after-page {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+}
+
+.break-after-page {
+  break-after: page;
+  page-break-after: always;
+}
+
+/* Custom JobSlipSheet adjustments */
+.print-doc--slip .print-doc__table td.print-doc__article-name {
+  font-size: inherit; /* same size as the other values in the row */
+  font-weight: var(--report-body-font-weight, var(--report-font-weight, 700));
+}
+
+.print-doc--slip .print-doc__table .print-doc__grand-total,
+.print-doc--slip .print-doc__table .print-doc__grand-total-val,
+.print-doc--slip .print-doc__table .print-doc__grand-total-header {
+  font-size: 14pt; /* Increase font size of total pairs and its value */
+  font-weight: var(--report-subheading-font-weight, var(--report-font-weight, 900));
+}
