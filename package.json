@@ -1,7 +1,7 @@
 {
-  "name": "@dotevolve/docForge",
+  "name": "@dotevolve/doc-forge",
   "version": "0.1.0",
-  "description": "DotEvolve shared library",
+  "description": "DocForge: Pure declarative document and print rendering engine",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
