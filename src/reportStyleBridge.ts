@@ -14,9 +14,14 @@ import {
 export function computeReportStyleVariables(
   descriptor: ReportTemplateDescriptor
 ): Record<string, string> {
-  const { page, styles } = descriptor;
-  const margins = page.margins;
-  const orientation = page.orientation;
+  const page = descriptor?.page || {
+    size: 'A4' as const,
+    orientation: 'portrait' as const,
+    margins: { top: 10, right: 10, bottom: 10, left: 18 },
+  };
+  const styles = descriptor?.styles || ({} as any);
+  const margins = page.margins || { top: 10, right: 10, bottom: 10, left: 18 };
+  const orientation = page.orientation || 'portrait';
 
   // Compute orientation-aware physical printable dimensions
   const isA5 = page.size === 'A5';
@@ -36,7 +41,7 @@ export function computeReportStyleVariables(
   const portraitContentWidthMm = Math.max(50, rawWidth - margins.left - margins.right);
   const landscapeContentWidthMm = Math.max(50, rawHeight - margins.left - margins.right);
 
-  const baseFontSizePt = styles.fontSizePt || (descriptor.slug === 'job-slip' ? 11 : 9);
+  const baseFontSizePt = styles.fontSizePt || (descriptor?.slug === 'job-slip' ? 11 : 9);
 
   const vars: Record<string, string> = {
     // Canonical DocForge variables
