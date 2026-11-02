@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   FileText,
   Sliders,
@@ -6,18 +6,23 @@ import {
   Maximize2,
   Code,
   RotateCcw,
-  Layers,
   Sparkles,
   ExternalLink,
   CheckCircle2,
+  AlertCircle,
+  Edit3,
+  Copy,
   X,
+  FileCode,
 } from 'lucide-react';
 import {
   DocumentPreview,
   DocumentPreviewModal,
   TemplateCustomizerSidebar,
   ReportTemplateDescriptor,
+  ReportTemplateDescriptorSchema,
   DataDoc,
+  DataDocSchema,
   buildPrintPageStyle,
 } from '@dotevolve/doc-forge';
 import { useReactToPrint } from 'react-to-print';
@@ -35,8 +40,12 @@ import {
   inventoryLedgerDescriptor,
   inventoryLedgerDataDoc,
 } from './fixtures/inventoryLedgerFixture';
+import {
+  basicPurchaseOrderDescriptor,
+  basicPurchaseOrderDataDoc,
+} from './fixtures/basicPurchaseOrderFixture';
 
-type DocumentType = 'manufacturing' | 'invoice' | 'inventory';
+type DocumentType = 'manufacturing' | 'invoice' | 'inventory' | 'custom';
 
 interface DocumentPreset {
   id: DocumentType;
@@ -79,6 +88,16 @@ const PRESETS: Record<DocumentType, DocumentPreset> = {
     defaultDescriptor: inventoryLedgerDescriptor,
     dataDoc: inventoryLedgerDataDoc,
   },
+  custom: {
+    id: 'custom',
+    title: 'Custom Playground',
+    badge: 'User Defined PO',
+    icon: '📝',
+    description:
+      'Editable custom descriptor and ready-data document with live validation and hot reload.',
+    defaultDescriptor: basicPurchaseOrderDescriptor,
+    dataDoc: basicPurchaseOrderDataDoc,
+  },
 };
 
 export default function App() {
@@ -87,17 +106,40 @@ export default function App() {
     manufacturing: JSON.parse(JSON.stringify(manufacturingSlipDescriptor)),
     invoice: JSON.parse(JSON.stringify(commercialInvoiceDescriptor)),
     inventory: JSON.parse(JSON.stringify(inventoryLedgerDescriptor)),
+    custom: JSON.parse(JSON.stringify(basicPurchaseOrderDescriptor)),
   });
+
+  const [customDataDoc, setCustomDataDoc] = useState<DataDoc>(() =>
+    JSON.parse(JSON.stringify(basicPurchaseOrderDataDoc))
+  );
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Inspector & Editor State
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
   const [jsonTab, setJsonTab] = useState<'descriptor' | 'dataDoc'>('descriptor');
+  const [editorText, setEditorText] = useState('');
+  const [jsonError, setJsonError] = useState<string | null>(null);
+  const [applySuccess, setApplySuccess] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
 
   const activePreset = PRESETS[selectedType];
   const activeDescriptor = descriptors[selectedType];
-  const activeDataDoc = activePreset.dataDoc;
+  const activeDataDoc = selectedType === 'custom' ? customDataDoc : activePreset.dataDoc;
+
+  // Sync editor text whenever opening modal or switching tabs
+  useEffect(() => {
+    if (jsonModalOpen) {
+      const source =
+        jsonTab === 'descriptor'
+          ? JSON.stringify(activeDescriptor, null, 2)
+          : JSON.stringify(activeDataDoc, null, 2);
+      setEditorText(source);
+      setJsonError(null);
+      setApplySuccess(false);
+    }
+  }, [jsonModalOpen, jsonTab, activeDescriptor, activeDataDoc]);
 
   // Direct Browser Print Ref
   const printComponentRef = useRef<HTMLDivElement>(null);
@@ -119,18 +161,78 @@ export default function App() {
   };
 
   const handleReset = () => {
-    setDescriptors((prev) => ({
-      ...prev,
-      [selectedType]: JSON.parse(JSON.stringify(activePreset.defaultDescriptor)),
-    }));
+    if (selectedType === 'custom') {
+      setDescriptors((prev) => ({
+        ...prev,
+        custom: JSON.parse(JSON.stringify(basicPurchaseOrderDescriptor)),
+      }));
+      setCustomDataDoc(JSON.parse(JSON.stringify(basicPurchaseOrderDataDoc)));
+    } else {
+      setDescriptors((prev) => ({
+        ...prev,
+        [selectedType]: JSON.parse(JSON.stringify(activePreset.defaultDescriptor)),
+      }));
+    }
+  };
+
+  const handleLoadBasicExample = () => {
+    if (jsonTab === 'descriptor') {
+      setEditorText(JSON.stringify(basicPurchaseOrderDescriptor, null, 2));
+    } else {
+      setEditorText(JSON.stringify(basicPurchaseOrderDataDoc, null, 2));
+    }
+    setJsonError(null);
+  };
+
+  const handleFormatJson = () => {
+    try {
+      const parsed = JSON.parse(editorText);
+      setEditorText(JSON.stringify(parsed, null, 2));
+      setJsonError(null);
+    } catch (err: any) {
+      setJsonError(`JSON Syntax Error: ${err.message}`);
+    }
+  };
+
+  const handleApplyJson = () => {
+    try {
+      setJsonError(null);
+      const parsed = JSON.parse(editorText);
+
+      if (jsonTab === 'descriptor') {
+        const result = ReportTemplateDescriptorSchema.safeParse(parsed);
+        if (!result.success) {
+          const firstErr = result.error.issues[0];
+          const pathStr = firstErr.path.join('.') || 'root';
+          setJsonError(`Descriptor Schema Error in "${pathStr}": ${firstErr.message}`);
+          return;
+        }
+        setDescriptors((prev) => ({
+          ...prev,
+          custom: result.data,
+        }));
+      } else {
+        const result = DataDocSchema.safeParse(parsed);
+        if (!result.success) {
+          const firstErr = result.error.issues[0];
+          const pathStr = firstErr.path.join('.') || 'root';
+          setJsonError(`DataDoc Schema Error in "${pathStr}": ${firstErr.message}`);
+          return;
+        }
+        setCustomDataDoc(result.data);
+      }
+
+      // Switch to custom preset to see results live
+      setSelectedType('custom');
+      setApplySuccess(true);
+      setTimeout(() => setApplySuccess(false), 2500);
+    } catch (err: any) {
+      setJsonError(`JSON Parse Error: ${err.message}`);
+    }
   };
 
   const handleCopyJson = () => {
-    const payload =
-      jsonTab === 'descriptor'
-        ? JSON.stringify(activeDescriptor, null, 2)
-        : JSON.stringify(activeDataDoc, null, 2);
-    navigator.clipboard.writeText(payload);
+    navigator.clipboard.writeText(editorText);
     setCopyFeedback(true);
     setTimeout(() => setCopyFeedback(false), 2000);
   };
@@ -148,7 +250,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base tracking-tight text-white">DocForge</span>
                 <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                  v0.1.0
+                  v0.1.3
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 hidden sm:block">
@@ -298,6 +400,17 @@ export default function App() {
               <span className="font-medium text-slate-300">{activePreset.title}</span>
               <span className="text-slate-600">•</span>
               <span className="hidden md:inline text-slate-400">{activePreset.description}</span>
+              {selectedType === 'custom' && (
+                <button
+                  type="button"
+                  onClick={() => setJsonModalOpen(true)}
+                  className="ml-2 px-2 py-0.5 rounded text-[11px] font-medium bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600/50 flex items-center gap-1 transition cursor-pointer"
+                  title="Open live JSON editor"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  <span>Edit Custom Spec</span>
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[11px] font-mono text-slate-500">
@@ -336,28 +449,30 @@ export default function App() {
         />
       )}
 
-      {/* JSON Schema & DataDoc Inspector Modal */}
+      {/* JSON Schema & DataDoc Inspector & Custom Editor Modal */}
       {jsonModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
           onClick={() => setJsonModalOpen(false)}
         >
           <div
-            className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden"
+            className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950">
+            <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3.5 border-b border-slate-800 bg-slate-950 shrink-0">
               <div className="flex items-center gap-3">
                 <Code className="w-5 h-5 text-indigo-400" />
-                <h3 className="font-semibold text-white text-base">Declarative Specs Inspector</h3>
+                <h3 className="font-semibold text-white text-base">
+                  Declarative Specs & Playground
+                </h3>
                 <div className="flex items-center bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs">
                   <button
                     type="button"
                     onClick={() => setJsonTab('descriptor')}
-                    className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                    className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
                       jsonTab === 'descriptor'
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -366,9 +481,9 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setJsonTab('dataDoc')}
-                    className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                    className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
                       jsonTab === 'dataDoc'
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-indigo-600 text-white shadow-sm'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -378,10 +493,33 @@ export default function App() {
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Load Basic Example */}
+                <button
+                  type="button"
+                  onClick={handleLoadBasicExample}
+                  className="px-2.5 py-1.5 rounded-md bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 text-xs text-amber-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Load clean basic Purchase Order example"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Load Basic Example</span>
+                </button>
+
+                {/* Format JSON */}
+                <button
+                  type="button"
+                  onClick={handleFormatJson}
+                  className="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Re-indent and format JSON"
+                >
+                  <FileCode className="w-3.5 h-3.5" />
+                  <span>Format</span>
+                </button>
+
+                {/* Copy JSON */}
                 <button
                   type="button"
                   onClick={handleCopyJson}
-                  className="px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium flex items-center gap-1.5 transition-colors"
+                  className="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   {copyFeedback ? (
                     <>
@@ -390,27 +528,76 @@ export default function App() {
                     </>
                   ) : (
                     <>
-                      <span>Copy JSON</span>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
                     </>
                   )}
                 </button>
+
+                {/* Apply to Live Canvas */}
+                <button
+                  type="button"
+                  onClick={handleApplyJson}
+                  className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow cursor-pointer"
+                  title="Validate schema with Zod and apply to live document preview"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Apply to Live Canvas</span>
+                </button>
+
+                <div className="h-5 w-px bg-slate-800 mx-1" />
+
                 <button
                   type="button"
                   onClick={() => setJsonModalOpen(false)}
-                  className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                  title="Close Inspector (Esc)"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Code Body */}
-            <div className="p-4 flex-1 overflow-auto bg-slate-950 font-mono text-xs leading-relaxed text-slate-300">
-              <pre className="p-4 bg-slate-900/50 rounded-lg border border-slate-800 overflow-x-auto selection:bg-indigo-900 selection:text-white">
-                {jsonTab === 'descriptor'
-                  ? JSON.stringify(activeDescriptor, null, 2)
-                  : JSON.stringify(activeDataDoc, null, 2)}
-              </pre>
+            {/* Error & Success Notification Banners */}
+            {jsonError && (
+              <div className="px-6 py-2.5 bg-rose-950/80 border-b border-rose-800/80 text-rose-200 text-xs flex items-center gap-2 shrink-0">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span className="font-mono break-all">{jsonError}</span>
+              </div>
+            )}
+            {applySuccess && (
+              <div className="px-6 py-2.5 bg-emerald-950/80 border-b border-emerald-800/80 text-emerald-200 text-xs flex items-center gap-2 shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  Valid specification! Successfully applied to live canvas and custom preset.
+                </span>
+              </div>
+            )}
+
+            {/* Editable JSON Area */}
+            <div className="flex-1 relative bg-slate-950 flex flex-col min-h-0 overflow-hidden">
+              <textarea
+                value={editorText}
+                onChange={(e) => {
+                  setEditorText(e.target.value);
+                  if (jsonError) setJsonError(null);
+                }}
+                spellCheck={false}
+                className="w-full h-full p-4 font-mono text-xs leading-relaxed text-slate-200 bg-slate-950 border-0 focus:outline-none resize-none selection:bg-indigo-900 selection:text-white overflow-auto"
+                placeholder="Enter valid JSON descriptor or DataDoc..."
+              />
+            </div>
+
+            {/* Footer with Hint */}
+            <div className="px-6 py-2 bg-slate-950/90 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between shrink-0">
+              <span>
+                💡 Tip: You can edit or paste your own JSON specification. Click{' '}
+                <strong className="text-slate-300">"Apply to Live Canvas"</strong> to validate with
+                Zod and render instantly.
+              </span>
+              <span className="font-mono text-slate-500">
+                {jsonTab === 'descriptor' ? 'ReportTemplateDescriptor' : 'DataDoc'}
+              </span>
             </div>
           </div>
         </div>

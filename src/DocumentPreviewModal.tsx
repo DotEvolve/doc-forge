@@ -8,6 +8,7 @@ import {
   Columns,
   ChevronDown,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { Modal } from './components/Modal';
 import { useReactToPrint } from 'react-to-print';
@@ -509,8 +510,15 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   const effectiveTitle = title || draft.name || 'Document Print Studio';
 
   return (
-    <Modal isOpen={open} onClose={onClose} title={effectiveTitle} size="full">
-      <div className="flex flex-col h-[calc(90vh-80px)] w-full overflow-hidden">
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      title={effectiveTitle}
+      size="full"
+      hideHeader={true}
+      bodyClassName="p-0 flex-1 flex flex-col min-h-0 overflow-hidden"
+    >
+      <div className="flex flex-col h-full w-full overflow-hidden bg-slate-100">
         {/* Top Action & Status Bar */}
         <header className="flex flex-row items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-3">
@@ -541,7 +549,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                   type="button"
                   onClick={handleResetDefaults}
                   disabled={isSaving || templateLoading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md transition disabled:opacity-50 cursor-pointer"
                   title="Reset layout options"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -554,7 +562,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 type="button"
                 onClick={handleRestoreFactoryDefaults}
                 disabled={isSaving || templateLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-md transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-md transition disabled:opacity-50 cursor-pointer"
                 title="Restore factory default layout for all users"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -567,7 +575,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 type="button"
                 onClick={handleSaveTenantDefault}
                 disabled={isSaving || templateLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-md transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 rounded-md transition disabled:opacity-50 cursor-pointer"
               >
                 <Save className="w-3.5 h-3.5" />
                 {isSaving ? 'Saving...' : 'Save Tenant Default'}
@@ -578,10 +586,22 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               type="button"
               onClick={handleTriggerPrint}
               disabled={isSaving || templateLoading}
-              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 rounded-md shadow transition"
+              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 rounded-md shadow transition cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               {printButtonLabel || 'Print Document'}
+            </button>
+
+            <div className="h-5 w-px bg-slate-200 mx-1" />
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close studio"
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+              title="Close Studio (Esc)"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
         </header>
