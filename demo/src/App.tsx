@@ -447,14 +447,22 @@ export default function App() {
           </div>
 
           {/* Interactive Document Preview */}
-          <div className="flex-1 overflow-auto flex items-center justify-center p-4">
-            <div ref={printComponentRef} className="w-full flex justify-center">
-              <DocumentPreview
-                descriptor={activeDescriptor}
-                data={activeDataDoc}
-                initialZoom={0.85}
-                showToolbar={true}
-              />
+          <div className="flex-1 min-h-0 relative overflow-hidden">
+            <DocumentPreview
+              descriptor={activeDescriptor}
+              data={activeDataDoc}
+              initialZoom={0.85}
+              showToolbar={true}
+            />
+            {/* Hidden Target for Direct Browser Print */}
+            <div className="hidden">
+              <div ref={printComponentRef}>
+                <DocumentPreview
+                  descriptor={activeDescriptor}
+                  data={activeDataDoc}
+                  showToolbar={false}
+                />
+              </div>
             </div>
           </div>
         </main>
