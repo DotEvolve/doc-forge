@@ -46,13 +46,13 @@ const readAttributes = (item: any): Record<string, any> => {
 };
 
 /**
- * Transforms a Floorix Job entity and tenant configuration into a ready-data DataDoc.
+ * Transforms an industrial job or manufacturing work order entity and tenant configuration into a ready-data DataDoc.
  * Strict adherence to Ready-Data Principle: All calculations, aggregations, and
  * date pre-formatting are executed here. DocForge section primitives do zero math.
  */
 export function jobToDataDoc(job: any, options: JobSlipAdapterOptions = {}): DataDoc {
   const {
-    tenantName = 'Floorix Manufacturing',
+    tenantName = 'Acme Manufacturing',
     articleAttributes = [],
     workerMap = {},
     sizeRange = [],

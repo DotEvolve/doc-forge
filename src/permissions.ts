@@ -18,7 +18,7 @@ export function normalizeRole(role?: string): string {
   return (role || '').trim().toLowerCase().replace(/_/g, '-');
 }
 
-/** Default administrative roles permitted to manage templates in Floorix */
+/** Default administrative roles permitted to manage document templates */
 export const DEFAULT_MANAGE_ROLES = [
   'super-admin',
   'tenant-admin',
@@ -70,7 +70,7 @@ export function canSaveTenantDefault(
 
   const userRole = normalizeRole(user.role);
 
-  // User permission check (with Floorix role fallback since client AuthUser has no permissions array)
+  // User permission check (with role fallback when client AuthUser has no permissions array)
   const hasManagePermission =
     user.permissions?.includes(REPORT_TEMPLATES_MANAGE) || DEFAULT_MANAGE_ROLES.includes(userRole);
 
