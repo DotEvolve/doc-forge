@@ -201,6 +201,26 @@ export const ReportTemplateDescriptorSchema = z
 // Normalization Shim: bridges legacy flat descriptors to section blueprints
 // ---------------------------------------------------------------------------
 
+export const NORMALIZED_DESCRIPTOR_SYMBOL = Symbol.for('@dotevolve/doc-forge.normalized');
+
+export function markAsNormalizedDescriptor<T extends object>(descriptor: T): T {
+  Object.defineProperty(descriptor, NORMALIZED_DESCRIPTOR_SYMBOL, {
+    value: true,
+    enumerable: false,
+    writable: false,
+    configurable: true,
+  });
+  return descriptor;
+}
+
+export function isNormalizedDescriptor(descriptor: unknown): boolean {
+  return Boolean(
+    descriptor &&
+    typeof descriptor === 'object' &&
+    (descriptor as any)[NORMALIZED_DESCRIPTOR_SYMBOL] === true
+  );
+}
+
 export interface NormalizeDescriptorOptions {
   strict?: boolean;
 }
@@ -218,7 +238,7 @@ export function normalizeTemplateDescriptor(
     console.warn(
       '[DocForge] normalizeTemplateDescriptor received invalid descriptor; using fallback defaults.'
     );
-    return {
+    return markAsNormalizedDescriptor({
       slug: 'fallback-report',
       name: 'Report',
       version: 1,
@@ -238,7 +258,7 @@ export function normalizeTemplateDescriptor(
         lineHeight: 1.3,
       },
       sections: [],
-    };
+    });
   }
 
   // 1. If already contains non-empty sections, validate safely while syncing slipsPerSheet
@@ -282,7 +302,7 @@ export function normalizeTemplateDescriptor(
     };
     const parsed = ReportTemplateDescriptorSchema.safeParse(adjusted);
     if (parsed.success) {
-      return parsed.data;
+      return markAsNormalizedDescriptor(parsed.data);
     }
     if (isStrict) {
       throw new Error(
@@ -292,7 +312,7 @@ export function normalizeTemplateDescriptor(
     console.warn(
       `[DocForge] TemplateDescriptor validation warnings: ${parsed.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
     );
-    return adjusted as ReportTemplateDescriptor;
+    return markAsNormalizedDescriptor(adjusted as ReportTemplateDescriptor);
   }
 
   // 2. Synthesize sections from legacy fields
@@ -432,7 +452,7 @@ export function normalizeTemplateDescriptor(
   const parsed = ReportTemplateDescriptorSchema.safeParse(merged);
   if (!parsed.success) {
     console.warn('[DocForge] normalizeTemplateDescriptor warnings:', parsed.error.format());
-    return merged as ReportTemplateDescriptor;
+    return markAsNormalizedDescriptor(merged as ReportTemplateDescriptor);
   }
-  return parsed.data;
+  return markAsNormalizedDescriptor(parsed.data);
 }

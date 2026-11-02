@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    contrib: 'src/contrib/index.ts',
     styles: 'src/styles/printDoc.css',
   },
   format: ['cjs', 'esm'],

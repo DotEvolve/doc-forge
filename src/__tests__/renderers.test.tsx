@@ -8,6 +8,7 @@ import {
   DEFAULT_JOB_SLIP_DESCRIPTOR,
   DEFAULT_REPORT_ARTICLES_DESCRIPTOR,
 } from '../defaultDescriptors';
+import { isNormalizedDescriptor, NORMALIZED_DESCRIPTOR_SYMBOL } from '../schemas';
 import { jobToDataDoc } from '../adapters/jobSlipAdapter';
 import { reportToDataDoc } from '../adapters/tabularReportAdapter';
 
@@ -418,5 +419,43 @@ describe('DocForge Renderers & Primitives', () => {
     expect(rows[2].children[0].textContent).toBe('WH-East');
     expect(rows[2].children[1].textContent).toBe('SKU-002');
     expect(rows[2].children[2].textContent).toBe('Standard Pack');
+  });
+
+  it('correctly marks descriptors with NORMALIZED_DESCRIPTOR_SYMBOL sentinel', () => {
+    expect(isNormalizedDescriptor(DEFAULT_JOB_SLIP_DESCRIPTOR)).toBe(true);
+    expect(isNormalizedDescriptor({ slug: 'raw', version: 1 })).toBe(false);
+  });
+
+  it('runs raw descriptors through normalization when rendered directly', () => {
+    const rawDescriptor = {
+      slug: 'raw-custom',
+      name: 'Raw Report',
+      version: 1,
+      page: {
+        size: 'A4' as const,
+        orientation: 'portrait' as const,
+        margins: { top: 10, right: 10, bottom: 10, left: 18 },
+      },
+      styles: {
+        primaryColor: '#123456',
+      },
+      sections: [
+        {
+          id: 'h',
+          type: 'header' as const,
+          visible: true,
+          showTitle: true,
+        },
+      ],
+    };
+
+    expect(isNormalizedDescriptor(rawDescriptor)).toBe(false);
+
+    const dataDoc = reportToDataDoc('Title', [], []);
+    const { container } = render(
+      <DocumentRenderer data={dataDoc} descriptor={rawDescriptor as any} />
+    );
+
+    expect(container.querySelector('.print-doc__header')).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { DataDoc } from './dataDoc';
 import { ReportTemplateDescriptor } from './types';
-import { normalizeTemplateDescriptor } from './schemas';
+import { normalizeTemplateDescriptor, isNormalizedDescriptor } from './schemas';
 import {
   DEFAULT_FALLBACK_DESCRIPTOR,
   DEFAULT_JOB_SLIP_DESCRIPTOR,
@@ -17,6 +17,8 @@ export interface DocumentRendererProps {
   className?: string;
   style?: React.CSSProperties;
   inspectionMode?: boolean;
+  /** Explicitly marks that the descriptor has already been validated and normalized */
+  isNormalized?: boolean;
 }
 
 /**
@@ -25,7 +27,10 @@ export interface DocumentRendererProps {
  * multi-slip or single-sheet page flow through UnitTileContainer.
  */
 export const DocumentRenderer = React.forwardRef<HTMLDivElement, DocumentRendererProps>(
-  function DocumentRenderer({ data, descriptor, className, style, inspectionMode }, ref) {
+  function DocumentRenderer(
+    { data, descriptor, className, style, inspectionMode, isNormalized },
+    ref
+  ) {
     const normalizedDescriptor = useMemo(() => {
       const getFallback = () => {
         if (descriptor?.slug && BUNDLED_DEFAULT_DESCRIPTORS[descriptor.slug]) {
@@ -38,14 +43,8 @@ export const DocumentRenderer = React.forwardRef<HTMLDivElement, DocumentRendere
       };
 
       if (!descriptor) return getFallback();
-      // Fast path: If descriptor is already canonical with active sections, return directly
-      if (
-        (descriptor as any).version === 1 &&
-        Array.isArray(descriptor.sections) &&
-        descriptor.sections.length > 0 &&
-        descriptor.page &&
-        descriptor.styles
-      ) {
+      // Fast path: Only bypass re-normalization if stamped with the normalizer sentinel or explicitly passed as normalized
+      if (isNormalized || isNormalizedDescriptor(descriptor)) {
         return descriptor;
       }
       try {
