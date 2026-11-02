@@ -9,6 +9,7 @@ on:
       - '.github/dependabot.yml'
       - '.gitignore'
       - 'LICENSE'
+      - 'demo/**'
   workflow_dispatch:
 
 concurrency:
