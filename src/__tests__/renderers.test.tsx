@@ -68,6 +68,7 @@ describe('DocForge Renderers & Primitives', () => {
       ],
       {
         tenantName: 'Floorix Manufacturing',
+        tableKey: 'articles',
       }
     );
 
@@ -79,6 +80,42 @@ describe('DocForge Renderers & Primitives', () => {
     expect(screen.getByText('ART-01')).toBeInTheDocument();
     expect(screen.getByText('ART-02')).toBeInTheDocument();
     expect(container.querySelector('table')).toBeInTheDocument();
+  });
+
+  it('does not fall back to main when an explicit tableKey is not found', () => {
+    const dataDoc = reportToDataDoc(
+      'Document',
+      [{ key: 'name', label: 'Name' }],
+      [{ name: 'Widget' }],
+      { tableKey: 'main' }
+    );
+
+    const descriptor = {
+      ...DEFAULT_REPORT_ARTICLES_DESCRIPTOR,
+      sections: [
+        {
+          id: 'sec-missing',
+          type: 'table' as const,
+          tableKey: 'nonExistentTable',
+          visible: true,
+        },
+      ],
+    };
+
+    const { container } = render(<DocumentRenderer data={dataDoc} descriptor={descriptor} />);
+    expect(container.querySelector('table')).toBeNull();
+  });
+
+  it('renders footer page number as empty span reliant on CSS counters', () => {
+    const dataDoc = reportToDataDoc('Report', [{ key: 'id', label: 'ID' }], [{ id: '1' }]);
+
+    const { container } = render(
+      <DocumentRenderer data={dataDoc} descriptor={DEFAULT_REPORT_ARTICLES_DESCRIPTOR} />
+    );
+
+    const pageNumSpan = container.querySelector('.print-doc__page-num .page-number');
+    expect(pageNumSpan).toBeInTheDocument();
+    expect(pageNumSpan?.textContent).toBe('');
   });
 
   it('renders interactive DocumentPreview simulator with toolbar and filing guide', () => {

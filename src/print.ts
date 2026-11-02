@@ -83,6 +83,9 @@ export const formatPrintPeriod = (
   end?: string | number | Date | null
 ): string => `${formatPrintDate(start)} – ${formatPrintDate(end)}`;
 
-/** `₹1,23,456` — rupee amounts on printed financial documents. */
-export const formatPrintAmount = (value?: number | null): string =>
-  `₹${(Number(value) || 0).toLocaleString('en-IN')}`;
+/** Flexible amount formatter on printed financial documents. */
+export const formatPrintAmount = (
+  value?: number | null,
+  currency: string = '₹',
+  locale: string = 'en-IN'
+): string => `${currency}${(Number(value) || 0).toLocaleString(locale)}`;

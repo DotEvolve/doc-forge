@@ -555,3 +555,14 @@
   font-size: 14pt; /* Increase font size of total pairs and its value */
   font-weight: var(--report-subheading-font-weight, var(--report-font-weight, 900));
 }
+
+/* Page numbering counters */
+.print-doc__page-num .page-number::after {
+  content: 'Page 1';
+}
+
+@media print {
+  .print-doc__page-num .page-number::after {
+    content: 'Page ' counter(page) ' of ' counter(pages);
+  }
+}

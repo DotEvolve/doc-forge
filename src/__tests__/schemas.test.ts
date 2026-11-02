@@ -201,14 +201,17 @@ describe('DocForge Canonical Schemas & Bridge', () => {
       expect(vars['--report-primary-color']).toBe('#000000');
     });
 
-    it('generates dynamic @page print CSS rules', () => {
+    it('generates dynamic @page print CSS rules with exact color adjust', () => {
       const css = buildDynamicPrintPageStyle('portrait', {
         top: 12,
         right: 12,
         bottom: 12,
         left: 18,
       });
-      expect(css).toBe('@page { size: A4 portrait; margin: 12mm 12mm 12mm 18mm; }');
+      expect(css).toContain('@page {');
+      expect(css).toContain('size: A4 portrait;');
+      expect(css).toContain('margin: 12mm 12mm 12mm 18mm;');
+      expect(css).toContain('print-color-adjust: exact;');
     });
   });
 

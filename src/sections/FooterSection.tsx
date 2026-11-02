@@ -21,7 +21,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ section, metadata 
       </div>
       {showPageNums && (
         <div className="print-doc__page-num text-right">
-          <span className="page-number">Page 1</span>
+          <span className="page-number" />
         </div>
       )}
     </footer>

@@ -38,6 +38,16 @@ export const DocumentRenderer = React.forwardRef<HTMLDivElement, DocumentRendere
       };
 
       if (!descriptor) return getFallback();
+      // Fast path: If descriptor is already canonical with active sections, return directly
+      if (
+        (descriptor as any).version === 1 &&
+        Array.isArray(descriptor.sections) &&
+        descriptor.sections.length > 0 &&
+        descriptor.page &&
+        descriptor.styles
+      ) {
+        return descriptor;
+      }
       try {
         return normalizeTemplateDescriptor(descriptor);
       } catch (e) {

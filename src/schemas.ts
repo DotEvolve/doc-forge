@@ -201,9 +201,44 @@ export const ReportTemplateDescriptorSchema = z
 // Normalization Shim: bridges legacy flat descriptors to section blueprints
 // ---------------------------------------------------------------------------
 
-export function normalizeTemplateDescriptor(rawDesc: any): ReportTemplateDescriptor {
+export interface NormalizeDescriptorOptions {
+  strict?: boolean;
+}
+
+export function normalizeTemplateDescriptor(
+  rawDesc: any,
+  options?: NormalizeDescriptorOptions
+): ReportTemplateDescriptor {
+  const isStrict = options?.strict !== false; // strict by default
+
   if (!rawDesc || typeof rawDesc !== 'object') {
-    throw new Error('[DocForge] normalizeTemplateDescriptor received invalid descriptor object.');
+    if (isStrict) {
+      throw new Error('[DocForge] normalizeTemplateDescriptor received invalid descriptor object.');
+    }
+    console.warn(
+      '[DocForge] normalizeTemplateDescriptor received invalid descriptor; using fallback defaults.'
+    );
+    return {
+      slug: 'fallback-report',
+      name: 'Report',
+      version: 1,
+      page: {
+        size: 'A4',
+        orientation: 'portrait',
+        margins: { top: 10, right: 10, bottom: 10, left: 18 },
+        showCutLine: false,
+      },
+      styles: {
+        primaryColor: '#0f172a',
+        accentColor: '#4f46e5',
+        headerBgColor: '#f8fafc',
+        zebraBgColor: '#f1f5f9',
+        fontFamily: 'Inter, -apple-system, sans-serif',
+        fontSizePt: 9,
+        lineHeight: 1.3,
+      },
+      sections: [],
+    };
   }
 
   // 1. If already contains non-empty sections, validate safely while syncing slipsPerSheet
@@ -249,10 +284,15 @@ export function normalizeTemplateDescriptor(rawDesc: any): ReportTemplateDescrip
     if (parsed.success) {
       return parsed.data;
     }
-    // Do not fall back to legacy section synthesis when sections are explicitly present!
-    throw new Error(
-      `[DocForge] TemplateDescriptor validation failed: ${parsed.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+    if (isStrict) {
+      throw new Error(
+        `[DocForge] TemplateDescriptor validation failed: ${parsed.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+      );
+    }
+    console.warn(
+      `[DocForge] TemplateDescriptor validation warnings: ${parsed.error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
     );
+    return adjusted as ReportTemplateDescriptor;
   }
 
   // 2. Synthesize sections from legacy fields

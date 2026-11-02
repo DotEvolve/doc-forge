@@ -132,5 +132,35 @@ describe('DocForge Domain Adapters', () => {
       expect(row?.qty).toBe(450); // Preserved numeric value
       expect(row?.missing).toBe('—'); // Handled null with em-dash
     });
+
+    it('registers only under the specified tableKey without polluting main', () => {
+      const doc = reportToDataDoc(
+        'Invoice',
+        [{ key: 'item', label: 'Item' }],
+        [{ item: 'Leather Soles' }],
+        {
+          tableKey: 'lineItems',
+        }
+      );
+
+      expect(doc.tables?.lineItems).toBeDefined();
+      expect(doc.tables?.main).toBeUndefined();
+      expect(doc.units[0].tables?.lineItems).toBeDefined();
+      expect(doc.units[0].tables?.main).toBeUndefined();
+    });
+
+    it('supports custom currency symbol and locale formatting', () => {
+      const doc = reportToDataDoc(
+        'Export Invoices',
+        [{ key: 'price', label: 'Price', format: 'currency' }],
+        [{ price: 2500.5 }],
+        {
+          currency: '$',
+          locale: 'en-US',
+        }
+      );
+
+      expect(doc.tables?.main?.rows[0].price).toBe('$2,500.5');
+    });
   });
 });

@@ -10,6 +10,8 @@ export interface TabularReportAdapterOptions {
   emptyMessage?: string;
   footerRow?: Record<string, string | number | boolean | null>;
   meta?: Array<{ label: string; value: any }> | Record<string, any>;
+  currency?: string;
+  locale?: string;
 }
 
 export interface TabularColumnInput {
@@ -42,6 +44,8 @@ export function reportToDataDoc(
     emptyMessage = 'No records found.',
     footerRow,
     meta,
+    currency = '₹',
+    locale = 'en-IN',
   } = options;
 
   // Flatten meta into summaries record
@@ -90,7 +94,7 @@ export function reportToDataDoc(
       if (rawVal === null || rawVal === undefined) {
         formatted[col.key] = '—';
       } else if (col.format === 'currency') {
-        formatted[col.key] = `₹${(Number(rawVal) || 0).toLocaleString('en-IN')}`;
+        formatted[col.key] = `${currency}${(Number(rawVal) || 0).toLocaleString(locale)}`;
       } else if (
         col.format === 'date' &&
         (rawVal instanceof Date || typeof rawVal === 'string' || typeof rawVal === 'number')
@@ -114,7 +118,6 @@ export function reportToDataDoc(
 
   const tablesMap: Record<string, DataDocTable> = {
     [tableKey]: mainTable,
-    main: mainTable,
   };
 
   const unit: DataDocUnit = {

@@ -11,8 +11,6 @@ import {
 } from 'lucide-react';
 import { Modal } from './components/Modal';
 import { useReactToPrint } from 'react-to-print';
-import { toast } from 'react-toastify';
-import './styles/printDoc.css';
 import { buildPrintPageStyle } from './print';
 import { ReportTemplateDescriptor } from './types';
 import { ReportTemplateDescriptorSchema } from './schemas';
@@ -60,6 +58,7 @@ export interface DocumentPreviewModalProps {
   initialOrientation?: 'portrait' | 'landscape';
   printButtonLabel?: string;
   inspectionMode?: boolean;
+  onNotification?: (type: 'info' | 'warning' | 'error', message: string) => void;
 }
 
 export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
@@ -84,9 +83,24 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   initialOrientation,
   printButtonLabel,
   inspectionMode = false,
+  onNotification,
 }) => {
   const componentRef = useRef<HTMLDivElement>(null);
   const isSaving = propIsSaving;
+
+  const notify = (type: 'info' | 'warning' | 'error', message: string) => {
+    if (onNotification) {
+      onNotification(type, message);
+    } else {
+      if (type === 'error') {
+        console.error(`[DocForge] ${message}`);
+      } else if (type === 'warning') {
+        console.warn(`[DocForge] ${message}`);
+      } else {
+        console.info(`[DocForge] ${message}`);
+      }
+    }
+  };
 
   const [draft, setDraft] = useState<ReportTemplateDescriptor>(() => {
     const base = safeNormalizeTemplateDescriptor(descriptor);
@@ -440,7 +454,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   const handleTriggerPrint = () => {
     const validation = ReportTemplateDescriptorSchema.safeParse(draft);
     if (!validation.success) {
-      toast.error(validation.error.issues[0]?.message || 'Invalid layout settings.');
+      notify('error', validation.error.issues[0]?.message || 'Invalid layout settings.');
       return;
     }
     handlePrint();
@@ -448,12 +462,12 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
   const handleSaveTenantDefault = async () => {
     if (!canManageDefault) {
-      toast.warning('Only administrators can save tenant-wide print defaults.');
+      notify('warning', 'Only administrators can save tenant-wide print defaults.');
       return;
     }
     const validation = ReportTemplateDescriptorSchema.safeParse(draft);
     if (!validation.success) {
-      toast.error(validation.error.issues[0]?.message || 'Invalid layout settings.');
+      notify('error', validation.error.issues[0]?.message || 'Invalid layout settings.');
       return;
     }
 
@@ -476,7 +490,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       setDraft(JSON.parse(JSON.stringify(normalized)));
       cleanDescriptorRef.current = normalized;
       isUserEditedRef.current = false;
-      toast.info('Reset print options to active template.');
+      notify('info', 'Reset print options to active template.');
     }
   };
 
