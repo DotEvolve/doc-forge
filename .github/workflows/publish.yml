@@ -75,6 +75,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v7
@@ -109,9 +110,6 @@ jobs:
           if [ "$EXISTS_NPM" = "$VERSION" ]; then
             echo "Version $VERSION is already published to public npm. Skipping publish."
           else
-            echo "Publishing $VERSION with dist-tag: $TAG to public npm"
-            npm publish --registry=https://registry.npmjs.org --access public --tag "$TAG"
+            echo "Publishing $VERSION with dist-tag: $TAG via Trusted Publishers (OIDC) to public npm"
+            npm publish --provenance --access public --tag "$TAG"
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true

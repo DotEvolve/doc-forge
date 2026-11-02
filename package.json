@@ -1,6 +1,6 @@
 {
   "name": "@dotevolve/doc-forge",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "DocForge: Pure declarative document and print rendering engine",
   "license": "MPL-2.0",
   "main": "./dist/index.js",
@@ -39,7 +39,7 @@
     "url": "git+https://github.com/DotEvolve/doc-forge.git"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "peerDependencies": {
     "lucide-react": ">=0.300.0",
