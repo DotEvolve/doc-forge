@@ -5,6 +5,7 @@ import {
   ReportStyles,
   ReportTemplateDescriptor,
 } from './types';
+import { buildPrintPageStyle } from './print';
 
 /**
  * Computes root scoped CSS Custom Properties from a ReportTemplateDescriptor.
@@ -192,19 +193,14 @@ function mapCellPadding(density?: string, slug?: string): string {
 
 /**
  * Generates dynamic @page print CSS rules from orientation and margins.
- * Perfectly integrates with react-to-print or browser print iframes.
+ * Delegates to canonical buildPrintPageStyle to ensure print-color-adjust: exact is preserved.
  */
 export function buildDynamicPrintPageStyle(
   orientation: PageOrientation = 'portrait',
   margins?: PageMargins,
   size: 'A4' | 'A5' | 'Letter' = 'A4'
 ): string {
-  const top = margins?.top ?? 10;
-  const right = margins?.right ?? 10;
-  const bottom = margins?.bottom ?? 10;
-  const left = margins?.left ?? 18; // Default 18mm left filing margin
-
-  return `@page { size: ${size} ${orientation}; margin: ${top}mm ${right}mm ${bottom}mm ${left}mm; }`;
+  return buildPrintPageStyle(orientation, margins, size);
 }
 
 /**

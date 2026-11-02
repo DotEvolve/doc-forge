@@ -16,11 +16,12 @@ export const TableSection: React.FC<TableSectionProps> = ({ section, data, unit,
   if (section.visible === false) return null;
 
   // Retrieve table from unit-specific tables first, then document-wide tables.
-  // Fallback to 'main' for single-table reports.
+  // Fallback to 'main' ONLY if tableKey is omitted or explicitly 'main'.
   const table = (unit?.tables?.[section.tableKey] ??
     data.tables?.[section.tableKey] ??
-    unit?.tables?.['main'] ??
-    data.tables?.['main']) as DataDocTable | undefined;
+    (!section.tableKey || section.tableKey === 'main'
+      ? (unit?.tables?.['main'] ?? data.tables?.['main'])
+      : undefined)) as DataDocTable | undefined;
 
   if (!table) {
     return null;

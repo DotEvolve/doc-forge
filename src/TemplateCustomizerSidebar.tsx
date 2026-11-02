@@ -149,7 +149,7 @@ const CommaSeparatedInput: React.FC<CommaSeparatedInputProps> = ({
 
   React.useEffect(() => {
     setText(value.join(', '));
-  }, [value.join(',')]);
+  }, [value]);
 
   const commit = () => {
     const tokens = text

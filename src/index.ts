@@ -1,5 +1,3 @@
-import './styles/printDoc.css';
-
 export * from './types';
 export * from './dataDoc';
 export * from './schemas';
@@ -8,6 +6,7 @@ export * from './reportStyleBridge';
 export * from './permissions';
 export * from './adapters/jobSlipAdapter';
 export * from './adapters/tabularReportAdapter';
+export * as contrib from './contrib/jobSlipAdapter';
 export * from './sections/HeaderSection';
 export * from './sections/KeyValueGridSection';
 export * from './sections/TableSection';

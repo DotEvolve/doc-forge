@@ -1,7 +1,7 @@
 import React from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { ReportTemplateDescriptor } from './types';
-import { buildDynamicPrintPageStyle } from './reportStyleBridge';
+import { buildPrintPageStyle } from './print';
 
 export interface UseDocumentPrinterOptions {
   descriptor: ReportTemplateDescriptor;
@@ -24,7 +24,7 @@ export function useDocumentPrinter({
   onAfterPrint,
   onPrintError,
 }: UseDocumentPrinterOptions): () => void {
-  const pageStyle = buildDynamicPrintPageStyle(
+  const pageStyle = buildPrintPageStyle(
     descriptor.page.orientation,
     descriptor.page.margins,
     descriptor.page.size
