@@ -147,11 +147,13 @@ export const TableSection: React.FC<TableSectionProps> = ({ section, data, unit,
                   row[col.key] !== null &&
                   String(row[col.key]) === String(rows[rIdx - 1][col.key]);
 
+                const placeholder =
+                  col.emptyPlaceholder ?? (section as any).emptyCellPlaceholder ?? '—';
                 const cellValue = isDupSuppressed
                   ? ''
                   : row[col.key] !== undefined && row[col.key] !== null
                     ? String(row[col.key])
-                    : '—';
+                    : placeholder;
 
                 const numericClass = isNumericCol(col, row[col.key])
                   ? 'print-doc__cell--numeric print-doc__qty'

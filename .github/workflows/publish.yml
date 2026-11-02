@@ -57,8 +57,14 @@ jobs:
           else
             TAG="latest"
           fi
-          echo "Publishing $VERSION with dist-tag: $TAG"
-          npm publish --tag "$TAG"
+          echo "Checking if @dotevolve/doc-forge@$VERSION already exists on GitHub Packages..."
+          EXISTS_GH=$(npm view "@dotevolve/doc-forge@${VERSION}" version --registry=https://npm.pkg.github.com 2>/dev/null || true)
+          if [ "$EXISTS_GH" = "$VERSION" ]; then
+            echo "Version $VERSION is already published to GitHub Packages. Skipping publish."
+          else
+            echo "Publishing $VERSION with dist-tag: $TAG to GitHub Packages"
+            npm publish --tag "$TAG"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -96,8 +102,14 @@ jobs:
           else
             TAG="latest"
           fi
-          echo "Publishing $VERSION with dist-tag: $TAG"
-          npm publish --registry=https://registry.npmjs.org --access public --tag "$TAG"
+          echo "Checking if @dotevolve/doc-forge@$VERSION already exists on public npm..."
+          EXISTS_NPM=$(npm view "@dotevolve/doc-forge@${VERSION}" version --registry=https://registry.npmjs.org 2>/dev/null || true)
+          if [ "$EXISTS_NPM" = "$VERSION" ]; then
+            echo "Version $VERSION is already published to public npm. Skipping publish."
+          else
+            echo "Publishing $VERSION with dist-tag: $TAG to public npm"
+            npm publish --registry=https://registry.npmjs.org --access public --tag "$TAG"
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         continue-on-error: true

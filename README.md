@@ -84,6 +84,19 @@ export function MyDocument() {
 
 ---
 
+## Styling & Tailwind Integration
+
+DocForge document rendering (`DocumentRenderer`, `DocumentPreview`) is styled via pure CSS Custom Properties and included stylesheets (`@dotevolve/doc-forge/styles`).
+
+The interactive UI components (`DocumentPreviewModal`, `TemplateCustomizerSidebar`) feature **zero-config self-contained fallback styles** ensuring they never collapse or render transparent even without Tailwind CSS. If your host application uses Tailwind CSS v4, include the source directive in your CSS to inherit your customized design system tokens:
+
+```css
+@import 'tailwindcss';
+@source "../node_modules/@dotevolve/doc-forge";
+```
+
+---
+
 ## Interactive Demo
 
 Try the interactive playground live at [doc-forge.dotevolve.net](https://doc-forge.dotevolve.net).

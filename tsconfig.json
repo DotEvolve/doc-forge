@@ -10,7 +10,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@dotevolve/doc-forge": ["./src/index.ts"],
+      "@dotevolve/doc-forge/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*"]
 }

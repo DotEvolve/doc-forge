@@ -26,17 +26,17 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
     descriptor: jobSlipJson,
     sampleDoc: {
       metadata: {
-        tenantName: 'SoleCraft Manufacturing Ltd.',
-        documentTitle: 'Production Job Slip',
-        documentNumber: 'JOB-2026-904',
+        tenantName: 'Acme Industrial Manufacturing',
+        documentTitle: 'Production Work Order Slip',
+        documentNumber: 'WO-2026-904',
         documentDate: '20 Oct 2026',
         subtitle: 'In Production',
       },
       summaries: {
-        jobNumber: 'JOB-2026-904',
-        articleName: 'Derby Oxford Supreme',
+        jobNumber: 'WO-2026-904',
+        articleName: 'Precision Unit Model-X',
         totalPairs: 120,
-        category: 'Formal Footwear',
+        category: 'Precision Equipment',
         jobDate: '20 Oct 2026',
         status: 'In Production',
       },
@@ -52,7 +52,7 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
           ],
           rows: [
             {
-              article: 'Derby Oxford',
+              article: 'Classic Oxford',
               color: 'Black Leather',
               size_7: 20,
               size_8: 30,
@@ -60,8 +60,8 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
               total: 60,
             },
             {
-              article: 'Derby Oxford',
-              color: 'Brown Suede',
+              article: 'Classic Oxford',
+              color: 'Tan Suede',
               size_7: 15,
               size_8: 35,
               size_9: 10,
@@ -80,15 +80,15 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
         },
         steps: {
           columns: [
-            { key: 'jobNumber', label: 'Job Number', widthPct: 25 },
-            { key: 'step_Cutting', label: 'Cutting Man', widthPct: 35 },
-            { key: 'step_Stitching', label: 'Stitching Man', widthPct: 40 },
+            { key: 'jobNumber', label: 'Work Order', widthPct: 25 },
+            { key: 'step_Cutting', label: 'Fabrication Lead', widthPct: 35 },
+            { key: 'step_Stitching', label: 'Assembly Lead', widthPct: 40 },
           ],
           rows: [
             {
-              jobNumber: 'JOB-2026-904',
-              step_Cutting: 'Rashid Khan',
-              step_Stitching: 'Tariq Aziz',
+              jobNumber: 'WO-2026-904',
+              step_Cutting: 'Operator A',
+              step_Stitching: 'Operator B',
             },
           ],
           emptyMessage: 'No steps assigned.',
@@ -97,24 +97,24 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
       units: [
         {
           unitId: 'unit-cutting',
-          unitTitle: 'Cutting Copy',
+          unitTitle: 'Fabrication Copy',
           unitNumber: 1,
           summaries: {
-            jobNumber: 'JOB-2026-904',
-            articleName: 'Derby Oxford Supreme',
+            jobNumber: 'WO-2026-904',
+            articleName: 'Precision Unit Model-X',
             totalPairs: 120,
-            worker: 'Rashid Khan',
+            worker: 'Operator A',
           },
         },
         {
           unitId: 'unit-stitching',
-          unitTitle: 'Stitching Copy',
+          unitTitle: 'Assembly Copy',
           unitNumber: 2,
           summaries: {
-            jobNumber: 'JOB-2026-904',
-            articleName: 'Derby Oxford Supreme',
+            jobNumber: 'WO-2026-904',
+            articleName: 'Precision Unit Model-X',
             totalPairs: 120,
-            worker: 'Tariq Aziz',
+            worker: 'Operator B',
           },
         },
       ],
@@ -125,7 +125,7 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
     descriptor: articlesReportJson,
     sampleDoc: {
       metadata: {
-        tenantName: 'SoleCraft Manufacturing Ltd.',
+        tenantName: 'Acme Industrial Manufacturing',
         documentTitle: 'Articles Inventory & Production Summary',
         documentDate: '20 Oct 2026',
       },
@@ -145,23 +145,23 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
           rows: [
             {
               code: 'ART-001',
-              name: 'Derby Oxford Classic',
+              name: 'Classic Oxford Model A',
               category: 'Formal',
-              cost: '₹2,450',
+              cost: '$48.00',
               stock: 320,
             },
             {
               code: 'ART-002',
-              name: 'Penny Loafer Moccasin',
+              name: 'Casual Loafer Model B',
               category: 'Casual',
-              cost: '₹1,950',
+              cost: '$38.00',
               stock: 180,
             },
             {
               code: 'ART-003',
-              name: 'Chelsea Ankle Boot',
+              name: 'Ankle Boot Model C',
               category: 'Boots',
-              cost: '₹3,200',
+              cost: '$62.00',
               stock: 95,
             },
           ],
@@ -189,14 +189,14 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
     descriptor: ledgerReportJson,
     sampleDoc: {
       metadata: {
-        tenantName: 'SoleCraft Manufacturing Ltd.',
+        tenantName: 'Acme Industrial Manufacturing',
         documentTitle: 'Worker Production Ledger',
         documentDate: '20 Oct 2026',
       },
       summaries: {
-        Worker: 'Rashid Khan (Cutting Operator)',
+        Worker: 'Operator A (Fabrication)',
         Period: '01 Oct 2026 – 20 Oct 2026',
-        TotalEarned: '₹48,500',
+        TotalEarned: '$1,940.00',
       },
       tables: {
         ledger: {
@@ -210,24 +210,24 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
           rows: [
             {
               date: '18 Oct 2026',
-              jobId: 'JOB-901',
-              op: 'Upper Die Cutting',
+              jobId: 'WO-901',
+              op: 'Precision Laser Cutting',
               pairs: 100,
-              amount: '₹12,000',
+              amount: '$480.00',
             },
             {
               date: '19 Oct 2026',
-              jobId: 'JOB-904',
-              op: 'Leather Skiving',
+              jobId: 'WO-904',
+              op: 'Surface Polishing',
               pairs: 120,
-              amount: '₹15,500',
+              amount: '$620.00',
             },
             {
               date: '20 Oct 2026',
-              jobId: 'JOB-910',
-              op: 'Lining Cutting',
+              jobId: 'WO-910',
+              op: 'Final Sub-Assembly',
               pairs: 180,
-              amount: '₹21,000',
+              amount: '$840.00',
             },
           ],
           footerRow: {
@@ -235,7 +235,7 @@ const PRESET_TEMPLATES: Record<string, { name: string; descriptor: any; sampleDo
             jobId: '',
             op: '',
             pairs: 400,
-            amount: '₹48,500',
+            amount: '$1,940.00',
           },
           emptyMessage: 'No ledger transactions recorded.',
         },
