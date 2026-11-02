@@ -14,6 +14,7 @@ import {
   Copy,
   X,
   FileCode,
+  Scale,
 } from 'lucide-react';
 import {
   DocumentPreview,
@@ -26,6 +27,7 @@ import {
   buildPrintPageStyle,
 } from '@dotevolve/doc-forge';
 import { useReactToPrint } from 'react-to-print';
+import { ArchitectureComparisonModal } from './components/ArchitectureComparisonModal';
 
 // Synthetic Fixtures
 import {
@@ -115,6 +117,7 @@ export default function App() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
 
   // Inspector & Editor State
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
@@ -304,6 +307,17 @@ export default function App() {
             </span>
           </button>
 
+          {/* Architecture & Comparison Guide */}
+          <button
+            type="button"
+            onClick={() => setCompareModalOpen(true)}
+            className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-indigo-400 hover:text-indigo-300 hover:bg-slate-800 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Architecture, Comparison vs pdfme/react-pdf & MPL-2.0 License"
+          >
+            <Scale className="w-4 h-4" />
+            <span className="hidden xl:inline">Why DocForge & Compare</span>
+          </button>
+
           {/* Raw JSON Inspector */}
           <button
             type="button"
@@ -413,6 +427,19 @@ export default function App() {
               )}
             </div>
             <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setCompareModalOpen(true)}
+                className="text-[11px] text-slate-400 hover:text-indigo-300 flex items-center gap-1.5 transition cursor-pointer"
+                title="View engine architecture, comparisons vs pdfme/react-pdf, and MPL-2.0 license"
+              >
+                <Scale className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">Why DocForge?</span>
+                <span className="px-1.5 py-0.5 rounded bg-indigo-950/80 border border-indigo-800/40 text-indigo-300 text-[10px] font-mono">
+                  MPL-2.0
+                </span>
+              </button>
+              <span className="text-slate-700 hidden sm:inline">•</span>
               <span className="text-[11px] font-mono text-slate-500">
                 {activeDescriptor.page.size} ({activeDescriptor.page.orientation})
               </span>
@@ -602,6 +629,12 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Architecture, Comparison & License Guide Modal */}
+      <ArchitectureComparisonModal
+        isOpen={compareModalOpen}
+        onClose={() => setCompareModalOpen(false)}
+      />
     </div>
   );
 }
