@@ -16,6 +16,8 @@ export const DataDocTableColumnSchema = z.object({
   /** Canonical column budget share in percent (sum <= 100) */
   widthPct: z.number().min(1).max(100).optional(),
   suppressDuplicates: z.boolean().optional(),
+  /** Optional custom fallback placeholder rendered when cell is null/undefined (default: '—') */
+  emptyPlaceholder: z.string().optional(),
 });
 
 export const DataDocTableSchema = z.object({

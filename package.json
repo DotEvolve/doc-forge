@@ -3,8 +3,8 @@
   "version": "0.1.3",
   "description": "DocForge: Pure declarative document and print rendering engine",
   "license": "MPL-2.0",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -24,13 +24,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     },
     "./contrib": {
       "types": "./dist/contrib/index.d.ts",
-      "import": "./dist/contrib.js",
-      "require": "./dist/contrib.cjs"
+      "import": "./dist/contrib.mjs",
+      "require": "./dist/contrib.js"
     },
     "./styles": "./dist/styles.css"
   },

@@ -56,6 +56,9 @@ jobs:
       - name: Check Formatting
         run: npx prettier --check . --ignore-unknown --ignore-path .prettierignore
 
+      - name: Run Typecheck
+        run: npm run lint
+
       - name: Run Tests
         run: npm test
 

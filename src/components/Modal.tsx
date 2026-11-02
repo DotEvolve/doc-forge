@@ -66,12 +66,36 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(15, 23, 42, 0.75)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0.75rem',
+      }}
       onClick={onClose}
     >
       <div
         className={`bg-white rounded-xl shadow-2xl w-full flex flex-col overflow-hidden ${sizeClasses[size]} ${
           size === 'full' ? 'h-[96vh] max-h-[96vh]' : 'max-h-[calc(100vh-8rem)]'
         }`}
+        style={{
+          backgroundColor: '#ffffff',
+          color: '#0f172a',
+          width: size === 'full' ? '98vw' : undefined,
+          maxWidth: size === 'full' ? '98vw' : undefined,
+          height: size === 'full' ? '96vh' : undefined,
+          maxHeight: size === 'full' ? '96vh' : 'calc(100vh - 4rem)',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+          borderRadius: '0.75rem',
+          position: 'relative',
+        }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
