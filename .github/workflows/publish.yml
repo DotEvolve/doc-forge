@@ -1,10 +1,9 @@
-name: Publish to NPM
+name: Publish Package
 
 on:
   push:
     branches: [master]
     paths-ignore:
-      - '**.md'
       - 'docs/**'
       - '.github/dependabot.yml'
       - '.gitignore'
@@ -17,7 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  publish:
+  publish-github-packages:
+    name: Publish to GitHub Packages
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -31,9 +31,9 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@dotevolve'
       - name: Install dependencies
-        run: rm -f package-lock.json && npm install
+        run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check Formatting
         run: npx prettier --check . --ignore-unknown --ignore-path .prettierignore
       - name: Run tests
@@ -41,6 +41,29 @@ jobs:
       - name: Build package
         run: npm run build
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: npm publish --@dotevolve:registry=https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm-registry:
+    name: Publish to Public NPM
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@dotevolve'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build package
+        run: npm run build
+      - name: Publish to Public NPM
+        run: npm publish --@dotevolve:registry=https://registry.npmjs.org --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true

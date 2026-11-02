@@ -18,7 +18,7 @@ updates:
     groups:
       dotevolve-packages:
         patterns:
-          - "@dotevolve/*"
+          - '@dotevolve/*'
 
   - package-ecosystem: github-actions
     directory: /

@@ -28,8 +28,12 @@
     },
     "./styles": "./dist/styles.css"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DotEvolve/doc-forge.git"
+  },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "peerDependencies": {
     "lucide-react": ">=0.300.0",
