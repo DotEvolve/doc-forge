@@ -33,7 +33,7 @@
     "url": "git+https://github.com/DotEvolve/doc-forge.git"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "peerDependencies": {
     "lucide-react": ">=0.300.0",

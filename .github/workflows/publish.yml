@@ -34,6 +34,7 @@ jobs:
         run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check Formatting
         run: npx prettier --check . --ignore-unknown --ignore-path .prettierignore
       - name: Run tests
@@ -41,9 +42,10 @@ jobs:
       - name: Build package
         run: npm run build
       - name: Publish to GitHub Packages
-        run: npm publish --@dotevolve:registry=https://npm.pkg.github.com
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm-registry:
     name: Publish to Public NPM
@@ -55,7 +57,8 @@ jobs:
         with:
           node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@dotevolve'
+      - name: Remove GitHub Packages .npmrc
+        run: rm -f .npmrc
       - name: Install dependencies
         run: npm ci
       - name: Run tests
@@ -63,7 +66,7 @@ jobs:
       - name: Build package
         run: npm run build
       - name: Publish to Public NPM
-        run: npm publish --@dotevolve:registry=https://registry.npmjs.org --access public
+        run: npm publish --registry=https://registry.npmjs.org --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         continue-on-error: true
