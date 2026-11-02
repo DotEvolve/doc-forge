@@ -2,7 +2,7 @@ name: Publish Package
 
 on:
   push:
-    branches: [master]
+    branches: [master, 'release/**', 'release-*']
     paths-ignore:
       - 'docs/**'
       - '.github/dependabot.yml'
@@ -42,7 +42,15 @@ jobs:
       - name: Build package
         run: npm run build
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release.* ]]; then
+            TAG="beta"
+          else
+            TAG="latest"
+          fi
+          echo "Publishing version $VERSION with dist-tag: $TAG"
+          npm publish --tag "$TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,7 +74,15 @@ jobs:
       - name: Build package
         run: npm run build
       - name: Publish to Public NPM
-        run: npm publish --registry=https://registry.npmjs.org --access public
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release.* ]]; then
+            TAG="beta"
+          else
+            TAG="latest"
+          fi
+          echo "Publishing version $VERSION to public npm with dist-tag: $TAG"
+          npm publish --registry=https://registry.npmjs.org --access public --tag "$TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         continue-on-error: true

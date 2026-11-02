@@ -332,7 +332,11 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             )}
 
             {/* Document Content */}
-            <DocumentRenderer data={effectiveDataDoc} descriptor={normalizedDescriptor} />
+            <DocumentRenderer
+              data={effectiveDataDoc}
+              descriptor={normalizedDescriptor}
+              isNormalized={true}
+            />
           </div>
         </div>
       </div>

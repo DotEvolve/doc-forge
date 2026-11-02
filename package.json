@@ -1,6 +1,6 @@
 {
   "name": "@dotevolve/doc-forge",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "DocForge: Pure declarative document and print rendering engine",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -25,6 +25,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./contrib": {
+      "types": "./dist/contrib/index.d.ts",
+      "import": "./dist/contrib.js",
+      "require": "./dist/contrib.cjs"
     },
     "./styles": "./dist/styles.css"
   },

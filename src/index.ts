@@ -4,9 +4,12 @@ export * from './schemas';
 export * from './defaultDescriptors';
 export * from './reportStyleBridge';
 export * from './permissions';
+// Legacy domain adapter (deprecated in favor of @dotevolve/doc-forge/contrib)
 export * from './adapters/jobSlipAdapter';
 export * from './adapters/tabularReportAdapter';
-export * as contrib from './contrib/jobSlipAdapter';
+
+// Contrib domain extensions
+export * as contrib from './contrib/index';
 export * from './sections/HeaderSection';
 export * from './sections/KeyValueGridSection';
 export * from './sections/TableSection';
