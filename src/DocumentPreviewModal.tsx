@@ -5,11 +5,11 @@ import {
   RotateCcw,
   Sliders,
   FileText,
-  Modal,
   Columns,
   ChevronDown,
   ChevronRight,
-} from '@dotevolve/ui-kit';
+} from 'lucide-react';
+import { Modal } from './components/Modal';
 import { useReactToPrint } from 'react-to-print';
 import { toast } from 'react-toastify';
 import './styles/printDoc.css';
@@ -491,7 +491,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     }
   };
 
-  const effectiveTenantName = propTenantName || 'Floorix';
+  const effectiveTenantName = propTenantName || 'DocForge';
   const effectiveTitle = title || draft.name || 'Document Print Studio';
 
   return (
