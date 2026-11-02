@@ -11,7 +11,7 @@ on:
       - '.gitignore'
       - 'LICENSE'
   push:
-    branches: [master]
+    branches: [dev, master, 'release/**']
     paths-ignore:
       - '**.md'
       - 'docs/**'
@@ -30,31 +30,40 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: >-
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      !(github.event_name == 'pull_request' && github.base_ref == 'master' && github.event.action == 'synchronize')
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
     permissions:
       contents: read
       packages: read
+
     steps:
       - uses: actions/checkout@v7
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version-file: '.node-version'
           cache: 'npm'
+
       - name: Install root dependencies
         run: npm ci
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install demo dependencies
         run: npm ci --prefix demo
-      - name: Run Lint
+
+      - name: Check Formatting
+        run: npx prettier --check . --ignore-unknown --ignore-path .prettierignore
+
+      - name: Run Typecheck
         run: npm run lint
-        continue-on-error: true
+
       - name: Run Tests
         run: npm test
+
       - name: Build Library Package
         run: npm run build
+
       - name: Build Demo Website
         run: npm run build:demo

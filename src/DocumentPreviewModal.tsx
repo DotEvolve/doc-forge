@@ -518,9 +518,15 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       hideHeader={true}
       bodyClassName="p-0 flex-1 flex flex-col min-h-0 overflow-hidden"
     >
-      <div className="flex flex-col h-full w-full overflow-hidden bg-slate-100">
+      <div
+        className="flex flex-col h-full w-full overflow-hidden bg-slate-100"
+        style={{ backgroundColor: '#f1f5f9', height: '100%', width: '100%' }}
+      >
         {/* Top Action & Status Bar */}
-        <header className="flex flex-row items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0">
+        <header
+          className="flex flex-row items-center justify-between px-6 py-3 bg-white border-b border-slate-200 shrink-0"
+          style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' }}
+        >
           <div className="flex items-center gap-3">
             <span className="text-base font-bold text-slate-800">{effectiveTenantName}</span>
             <span className="text-sm text-slate-500">|</span>
@@ -613,6 +619,13 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             className={`w-[380px] shrink-0 bg-slate-50 border-r border-slate-200 overflow-y-auto p-4 text-sm text-slate-800 transition-opacity ${
               isSaving || templateLoading ? 'pointer-events-none opacity-60' : ''
             }`}
+            style={{
+              width: '380px',
+              minWidth: '380px',
+              backgroundColor: '#f8fafc',
+              borderRight: '1px solid #e2e8f0',
+              flexShrink: 0,
+            }}
           >
             <fieldset
               disabled={isSaving || templateLoading}
@@ -1173,7 +1186,10 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           </aside>
 
           {/* RIGHT PANEL: Live WYSIWYG Print Canvas */}
-          <main className="flex-1 bg-slate-200/90 overflow-y-auto p-8 flex flex-col items-center">
+          <main
+            className="flex-1 bg-slate-200/90 overflow-y-auto p-8 flex flex-col items-center"
+            style={{ backgroundColor: '#e2e8f0', flex: 1 }}
+          >
             {/* Toolbar for Zoom & Guide */}
             <div className="mb-3 flex items-center justify-between w-full max-w-[850px] px-2 text-xs text-slate-600">
               <div className="flex items-center gap-2">

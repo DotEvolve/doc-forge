@@ -10,6 +10,6 @@ export default defineConfig({
   dts: false,
   clean: true,
   sourcemap: true,
-  external: ['react', 'react-dom', 'lucide-react', 'react-to-print', '@dotevolve/ui-kit'],
+  external: ['react', 'react-dom', 'lucide-react', 'react-to-print'],
   loader: { '.css': 'copy' },
 });

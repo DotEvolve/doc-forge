@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ReportTemplateDescriptor } from './types';
 import { DataDoc } from './dataDoc';
-import { normalizeTemplateDescriptor } from './schemas';
+import { normalizeTemplateDescriptor, isNormalizedDescriptor } from './schemas';
 import { computeReportStyleVariables } from './reportStyleBridge';
 import { DocumentRenderer } from './DocumentRenderer';
 
@@ -13,7 +13,54 @@ export interface DocumentPreviewProps {
   initialZoom?: number;
   /** Whether to show the top zoom and guide toolbar */
   showToolbar?: boolean;
+  /** Explicitly marks that the descriptor has already been validated and normalized */
+  isNormalized?: boolean;
+  /** Optional container class name */
+  className?: string;
+  /** Optional container style overrides */
+  style?: React.CSSProperties;
+  /** Optional toolbar class name */
+  toolbarClassName?: string;
 }
+
+const ROOT_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: '100%',
+  background: '#0f172a',
+  overflow: 'hidden',
+};
+
+const TOOLBAR_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '10px 16px',
+  background: '#1e293b',
+  borderBottom: '1px solid #334155',
+  color: '#e2e8f0',
+  fontSize: '13px',
+  userSelect: 'none',
+};
+
+const BADGE_STYLE: React.CSSProperties = {
+  fontSize: '11px',
+  background: '#334155',
+  padding: '2px 8px',
+  borderRadius: '4px',
+  textTransform: 'uppercase',
+};
+
+const CANVAS_CONTAINER_STYLE: React.CSSProperties = {
+  flex: 1,
+  overflow: 'auto',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  padding: '40px',
+  background: '#090d16',
+};
 
 /**
  * High-fidelity interactive document preview canvas.
@@ -24,17 +71,24 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   data,
   initialZoom = 0.85,
   showToolbar = true,
+  isNormalized,
+  className,
+  style,
+  toolbarClassName,
 }) => {
   const [zoom, setZoom] = useState<number>(initialZoom);
   const [showGuides, setShowGuides] = useState<boolean>(true);
 
   const normalizedDescriptor = useMemo(() => {
+    if (isNormalized || isNormalizedDescriptor(descriptor)) {
+      return descriptor;
+    }
     try {
       return normalizeTemplateDescriptor(descriptor);
     } catch {
       return descriptor;
     }
-  }, [descriptor]);
+  }, [descriptor, isNormalized]);
 
   const styleVariables = useMemo(() => {
     return computeReportStyleVariables(normalizedDescriptor);
@@ -141,40 +195,17 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
   return (
     <div
+      className={className}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-        background: '#0f172a',
-        overflow: 'hidden',
+        ...ROOT_STYLE,
+        ...style,
       }}
     >
       {showToolbar && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 16px',
-            background: '#1e293b',
-            borderBottom: '1px solid #334155',
-            color: '#e2e8f0',
-            fontSize: '13px',
-            userSelect: 'none',
-          }}
-        >
+        <div className={toolbarClassName} style={TOOLBAR_STYLE}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontWeight: 600, color: '#f8fafc' }}>{normalizedDescriptor.name}</span>
-            <span
-              style={{
-                fontSize: '11px',
-                background: '#334155',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                textTransform: 'uppercase',
-              }}
-            >
+            <span style={BADGE_STYLE}>
               {normalizedDescriptor.page.size} {normalizedDescriptor.page.orientation}
             </span>
           </div>
@@ -257,17 +288,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       )}
 
       {/* Canvas Area */}
-      <div
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          padding: '40px',
-          background: '#090d16',
-        }}
-      >
+      <div style={CANVAS_CONTAINER_STYLE}>
         <div
           style={{
             transform: `scale(${zoom})`,
