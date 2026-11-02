@@ -1,0 +1,176 @@
+import { DataDoc, ReportTemplateDescriptor } from '@dotevolve/doc-forge';
+
+export const basicPurchaseOrderDescriptor: ReportTemplateDescriptor = {
+  slug: 'purchase-order',
+  name: 'Standard Purchase Order',
+  version: 1,
+  page: {
+    size: 'A4',
+    orientation: 'portrait',
+    margins: { top: 10, right: 10, bottom: 10, left: 18 },
+    slipsPerSheet: 1,
+  },
+  styles: {
+    primaryColor: '#0f172a',
+    accentColor: '#2563eb',
+    headerBgColor: '#f8fafc',
+    zebraBgColor: '#f1f5f9',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    fontSizePt: 9.5,
+    lineHeight: 1.35,
+    compact: false,
+    cellPadding: 'normal',
+  },
+  sections: [
+    {
+      id: 'po-header',
+      type: 'header',
+      visible: true,
+      showTenantName: true,
+      showTitle: true,
+      showDocumentNumber: true,
+      documentNumberLabel: 'PO Number:',
+      showDate: true,
+      dateLabel: 'Order Date:',
+      showBorder: true,
+    },
+    {
+      id: 'divider-top',
+      type: 'divider',
+      visible: true,
+      style: 'solid',
+    },
+    {
+      id: 'vendor-shipping-grid',
+      type: 'key-value-grid',
+      visible: true,
+      columns: 3,
+      fields: [
+        { sourceKey: 'vendorName', label: 'Supplier / Vendor' },
+        { sourceKey: 'shipTo', label: 'Ship To Warehouse' },
+        { sourceKey: 'paymentTerms', label: 'Payment Terms' },
+        { sourceKey: 'buyerContact', label: 'Procurement Agent' },
+        { sourceKey: 'shippingMethod', label: 'Shipping Method' },
+        { sourceKey: 'deliveryDate', label: 'Required Delivery' },
+      ],
+    },
+    {
+      id: 'po-items-table',
+      type: 'table',
+      visible: true,
+      tableKey: 'orderItems',
+      showBorder: true,
+      zebraStriping: true,
+    },
+    {
+      id: 'po-notes',
+      type: 'notes',
+      visible: true,
+      title: 'Standard Procurement Terms & Instructions',
+      contentKey: 'termsAndConditions',
+    },
+    {
+      id: 'po-barcode',
+      type: 'barcode',
+      visible: true,
+      barcodeKey: 'poBarcode',
+      heightPx: 38,
+      align: 'left',
+    },
+    {
+      id: 'po-footer',
+      type: 'footer',
+      visible: true,
+      showPageNumbers: true,
+      showPrintedDate: true,
+      customText: 'Apex Global Logistics Corp. • Authorized Purchasing Requisition',
+    },
+  ],
+};
+
+export const basicPurchaseOrderDataDoc: DataDoc = {
+  metadata: {
+    tenantName: 'Apex Global Logistics Corp.',
+    documentTitle: 'Standard Purchase Order',
+    documentDate: 'Nov 02, 2026',
+    documentNumber: 'PO-2026-8840',
+  },
+  units: [
+    {
+      unitId: 'po-unit-1',
+      unitTitle: 'Purchase Order Details',
+      summaries: {
+        vendorName: 'Global Micro Components Inc.\n244 Innovation Blvd, San Jose, CA 95134',
+        shipTo: 'Apex Distribution Hub #4\nBay 12, Terminal Way, Seattle, WA 98101',
+        paymentTerms: 'Net 30 Days',
+        buyerContact: 'Sarah Lin (procurement@apexlogistics.example.com)',
+        shippingMethod: 'Express Air Freight (Door-to-Door)',
+        deliveryDate: 'Nov 16, 2026',
+        termsAndConditions:
+          '1. Goods must be securely packed and clearly labeled with PO number PO-2026-8840 on all cartons.\n2. Packing slip and Certificate of Conformance must accompany the shipment.\n3. Any defective or non-conforming items will be returned at supplier expense within 30 days of receipt.',
+      },
+      tables: {
+        orderItems: {
+          columns: [
+            { key: 'lineNo', label: '#', align: 'center', widthPct: 5 },
+            { key: 'itemCode', label: 'Item Code', align: 'left', widthPct: 18 },
+            { key: 'description', label: 'Item Description', align: 'left', widthPct: 42 },
+            { key: 'qty', label: 'Qty', align: 'right', widthPct: 10 },
+            { key: 'unitPrice', label: 'Unit Price', align: 'right', widthPct: 12 },
+            { key: 'total', label: 'Total', align: 'right', widthPct: 13 },
+          ],
+          rows: [
+            {
+              lineNo: '1',
+              itemCode: 'MCU-7700',
+              description: 'Dual-Core ARM Cortex M4 Microcontroller (QFN-64)',
+              qty: '500 pcs',
+              unitPrice: '$14.20',
+              total: '$7,100.00',
+            },
+            {
+              lineNo: '2',
+              itemCode: 'SEN-8821',
+              description: 'Digital Precision Temperature & Humidity Sensor (I2C)',
+              qty: '1,000 pcs',
+              unitPrice: '$3.50',
+              total: '$3,500.00',
+            },
+            {
+              lineNo: '3',
+              itemCode: 'PWR-1205',
+              description: '5V/3A High-Efficiency Step-Down Buck Regulator',
+              qty: '300 pcs',
+              unitPrice: '$6.80',
+              total: '$2,040.00',
+            },
+            {
+              lineNo: '4',
+              itemCode: 'PCB-4L-A',
+              description: '4-Layer FR4 Prototype Circuit Board (Custom Fab)',
+              qty: '100 pcs',
+              unitPrice: '$18.50',
+              total: '$1,850.00',
+            },
+          ],
+          footerRow: {
+            lineNo: '',
+            itemCode: '',
+            description: 'Subtotal & Total Amount (USD)',
+            qty: '1,900 pcs',
+            unitPrice: '',
+            total: '$14,490.00',
+          },
+          emptyMessage: 'No items in purchase order.',
+        },
+      },
+      barcodes: {
+        poBarcode: {
+          value: 'PO-2026-8840-APEX',
+          format: 'CODE128',
+          label: 'Barcode: PO-2026-8840-APEX',
+        },
+      },
+    },
+  ],
+};

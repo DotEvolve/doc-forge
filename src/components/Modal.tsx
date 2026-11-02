@@ -13,6 +13,8 @@ export interface ModalProps {
   onConfirm?: () => void;
   confirmLabel?: string;
   cancelLabel?: string;
+  bodyClassName?: string;
+  hideHeader?: boolean;
 }
 
 const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
@@ -26,7 +28,7 @@ const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
   '5xl': 'max-w-5xl',
   '6xl': 'max-w-6xl',
   '7xl': 'max-w-7xl',
-  full: 'max-w-full',
+  full: 'w-[98vw] max-w-[98vw]',
 };
 
 export const Modal: React.FC<ModalProps> = ({
@@ -41,6 +43,8 @@ export const Modal: React.FC<ModalProps> = ({
   onConfirm,
   confirmLabel,
   cancelLabel,
+  bodyClassName,
+  hideHeader = false,
 }) => {
   const titleId = useId();
 
@@ -61,34 +65,41 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-xl shadow-xl w-full flex flex-col overflow-hidden ${sizeClasses[size]} max-h-[calc(100vh-8rem)]`}
+        className={`bg-white rounded-xl shadow-2xl w-full flex flex-col overflow-hidden ${sizeClasses[size]} ${
+          size === 'full' ? 'h-[96vh] max-h-[96vh]' : 'max-h-[calc(100vh-8rem)]'
+        }`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
-          <h2 id={titleId} className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            {variant === 'danger' && (
-              <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0" aria-hidden="true" />
-            )}
-            {title}
-          </h2>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md p-1"
-          >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
-        </div>
+        {!hideHeader && (
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 shrink-0">
+            <h2
+              id={titleId}
+              className="text-lg font-semibold text-gray-900 flex items-center gap-2"
+            >
+              {variant === 'danger' && (
+                <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0" aria-hidden="true" />
+              )}
+              {title}
+            </h2>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md p-1"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
 
-        <div className="p-6 overflow-y-auto flex-1 min-h-0">
+        <div className={bodyClassName || 'p-6 overflow-y-auto flex-1 min-h-0'}>
           {children}
           {variant === 'danger' && destructiveWarning && (
             <p className="mt-3 text-sm font-semibold text-red-600">{destructiveWarning}</p>

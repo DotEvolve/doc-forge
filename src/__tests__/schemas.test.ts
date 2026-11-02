@@ -228,4 +228,20 @@ describe('DocForge Canonical Schemas & Bridge', () => {
       expect(BUNDLED_DEFAULT_DESCRIPTORS['report-tasks']).toBeDefined();
     });
   });
+
+  describe('Basic Purchase Order Example', () => {
+    it('validates basicPurchaseOrderDescriptor against ReportTemplateDescriptorSchema', async () => {
+      const { basicPurchaseOrderDescriptor } =
+        await import('../../demo/src/fixtures/basicPurchaseOrderFixture');
+      const res = ReportTemplateDescriptorSchema.safeParse(basicPurchaseOrderDescriptor);
+      expect(res.success).toBe(true);
+    });
+
+    it('validates basicPurchaseOrderDataDoc against DataDocSchema', async () => {
+      const { basicPurchaseOrderDataDoc } =
+        await import('../../demo/src/fixtures/basicPurchaseOrderFixture');
+      const res = DataDocSchema.safeParse(basicPurchaseOrderDataDoc);
+      expect(res.success).toBe(true);
+    });
+  });
 });
