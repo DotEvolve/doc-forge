@@ -320,8 +320,9 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             }
           >
             {/* Printable Filing Guide Overlay */}
-            {showGuides && (
+            {showToolbar && showGuides && (
               <div
+                className="print:hidden"
                 style={{
                   position: 'absolute',
                   top: `${normalizedDescriptor.page.margins.top}mm`,
