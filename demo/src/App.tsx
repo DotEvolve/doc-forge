@@ -104,7 +104,11 @@ export default function App() {
   const handleDirectPrint = useReactToPrint({
     contentRef: printComponentRef,
     documentTitle: `${activeDataDoc.metadata.documentTitle}_${activeDataDoc.metadata.documentNumber || 'print'}`,
-    pageStyle: buildPrintPageStyle(activeDescriptor),
+    pageStyle: buildPrintPageStyle(
+      activeDescriptor.page.orientation,
+      activeDescriptor.page.margins,
+      activeDescriptor.page.size
+    ),
   });
 
   const handleDescriptorChange = (updated: ReportTemplateDescriptor) => {

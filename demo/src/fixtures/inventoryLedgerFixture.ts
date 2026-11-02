@@ -98,11 +98,13 @@ export const inventoryLedgerDataDoc: DataDoc = {
     {
       unitId: 'unit-hub4',
       unitTitle: 'Central Distribution Hub #4 - Zone B & C',
-      keyValueData: {
+      summaries: {
         facility: 'Central Fulfilment Center #4 (Dallas, TX)',
         zone: 'Zone B (High-Bay Racks) & Zone C (Cold Vault)',
         leadAuditor: 'Marcus Vance, CPA (License #89210)',
         auditType: 'Q4 Annual Comprehensive Reconciliation',
+        findings:
+          'Net variance across 6 audited SKU lines is 0 units (1 minor bin cross-allocation between B-04-14 and C-01-09 investigated and corrected in SAP ERP). Overall inventory accuracy rate: 99.85%.',
       },
       tables: {
         auditLedger: {
@@ -173,7 +175,8 @@ export const inventoryLedgerDataDoc: DataDoc = {
               variance: '0',
             },
           ],
-          totals: {
+          emptyMessage: 'No inventory audit records.',
+          footerRow: {
             category: 'Total Zone Physical Units',
             bookQty: '660',
             countedQty: '660',
@@ -182,11 +185,10 @@ export const inventoryLedgerDataDoc: DataDoc = {
         },
       },
       barcodes: {
-        batchAuditCode: 'AUD-HUB4-2026-90-ZONE-BC',
-      },
-      notes: {
-        findings:
-          'Net variance across 6 audited SKU lines is 0 units (1 minor bin cross-allocation between B-04-14 and C-01-09 investigated and corrected in SAP ERP). Overall inventory accuracy rate: 99.85%.',
+        batchAuditCode: {
+          value: 'AUD-HUB4-2026-90-ZONE-BC',
+          format: 'CODE128',
+        },
       },
     },
   ],

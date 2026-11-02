@@ -107,13 +107,15 @@ export const commercialInvoiceDataDoc: DataDoc = {
     {
       unitId: 'inv-unit-1',
       unitTitle: 'Invoice Settlement Summary',
-      keyValueData: {
+      summaries: {
         billTo: 'Meridian Global Enterprises LLC\n100 Enterprise Way, Suite 400, Chicago, IL',
         taxId: 'US-EIN-948192014',
         currency: 'USD ($)',
         poRef: 'PO-MGE-2026-118',
         paymentTerms: 'Net 30 Days',
         dueDate: 'Dec 02, 2026',
+        wireInstructions:
+          'Bank Name: Silicon Valley Commercial Bank\nRouting Number (ABA): 121000358\nAccount Number: 8492019481\nSWIFT / BIC: SVBKUS6S\nBeneficiary: Nova Cloud & Network Technologies Inc.\nPlease reference Invoice #INV-2026-8819 in the wire description.',
       },
       tables: {
         lineItems: {
@@ -159,7 +161,8 @@ export const commercialInvoiceDataDoc: DataDoc = {
               amount: '$3,500.00',
             },
           ],
-          totals: {
+          emptyMessage: 'No billable line items.',
+          footerRow: {
             description: 'Total Net Deliverables',
             amount: '$14,000.00',
           },
@@ -192,14 +195,14 @@ export const commercialInvoiceDataDoc: DataDoc = {
               total: '$14,735.00',
             },
           ],
+          emptyMessage: 'No totals calculated.',
         },
       },
       barcodes: {
-        invoiceBarcode: 'INV-2026-8819-US',
-      },
-      notes: {
-        wireInstructions:
-          'Bank Name: Silicon Valley Commercial Bank\nRouting Number (ABA): 121000358\nAccount Number: 8492019481\nSWIFT / BIC: SVBKUS6S\nBeneficiary: Nova Cloud & Network Technologies Inc.\nPlease reference Invoice #INV-2026-8819 in the wire description.',
+        invoiceBarcode: {
+          value: 'INV-2026-8819-US',
+          format: 'CODE128',
+        },
       },
     },
   ],

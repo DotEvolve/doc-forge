@@ -100,13 +100,15 @@ export const manufacturingSlipDataDoc: DataDoc = {
     {
       unitId: 'unit-1',
       unitTitle: 'Batch #01 - TrailMaster Apex',
-      keyValueData: {
+      summaries: {
         customer: 'Apex Outdoor Retailers Corp',
         poNumber: 'PO-2026-9941',
         priority: 'High Express',
         targetDate: 'Nov 15, 2026',
         lineStation: 'Line 4 - Vulcanizing & Stitching',
         supervisor: 'Elena Rostova (ID: OP-412)',
+        qcNotes:
+          '1. Inspect double stitching along reinforced heel counter before joining to sole.\n2. Heat-press vulcanized outsole at 142°C for exactly 90 seconds.\n3. Insert antimicrobial orthotic innersole before carton boxing.\n4. Scan tracking barcode at Line 4 exit gate.',
       },
       tables: {
         items: {
@@ -178,18 +180,18 @@ export const manufacturingSlipDataDoc: DataDoc = {
               status: 'Queued',
             },
           ],
-          totals: {
+          emptyMessage: 'No order items registered.',
+          footerRow: {
             article: 'Total Batch Quantity',
             quantity: '1,030 Pairs',
           },
         },
       },
       barcodes: {
-        trackingCode: 'WO-89421-LN4-BATCH01',
-      },
-      notes: {
-        qcNotes:
-          '1. Inspect double stitching along reinforced heel counter before joining to sole.\n2. Heat-press vulcanized outsole at 142°C for exactly 90 seconds.\n3. Insert antimicrobial orthotic innersole before carton boxing.\n4. Scan tracking barcode at Line 4 exit gate.',
+        trackingCode: {
+          value: 'WO-89421-LN4-BATCH01',
+          format: 'CODE128',
+        },
       },
     },
   ],
