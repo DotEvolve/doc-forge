@@ -1,6 +1,6 @@
 {
   "name": "@dotevolve/doc-forge",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "DocForge: Pure declarative document and print rendering engine",
   "license": "MPL-2.0",
   "main": "./dist/index.js",

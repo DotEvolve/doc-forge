@@ -458,4 +458,11 @@ describe('DocForge Renderers & Primitives', () => {
 
     expect(container.querySelector('.print-doc__header')).toBeInTheDocument();
   });
+
+  it('exports DocumentStudio and DocForgeStudio alias from package index', async () => {
+    const { DocumentStudio, DocForgeStudio } = await import('../index');
+    expect(DocumentStudio).toBeDefined();
+    expect(DocForgeStudio).toBeDefined();
+    expect(DocumentStudio).toBe(DocForgeStudio);
+  });
 });
