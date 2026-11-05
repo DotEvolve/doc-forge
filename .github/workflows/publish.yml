@@ -51,14 +51,15 @@ jobs:
 
       - name: Determine dist-tag & publish to GitHub Packages
         run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release ]]; then
             TAG="beta"
           else
             TAG="latest"
           fi
-          echo "Checking if @dotevolve/doc-forge@$VERSION already exists on GitHub Packages..."
-          EXISTS_GH=$(npm view "@dotevolve/doc-forge@${VERSION}" version --registry=https://npm.pkg.github.com 2>/dev/null || true)
+          echo "Checking if $PACKAGE_NAME@$VERSION already exists on GitHub Packages..."
+          EXISTS_GH=$(npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://npm.pkg.github.com 2>/dev/null || true)
           if [ "$EXISTS_GH" = "$VERSION" ]; then
             echo "Version $VERSION is already published to GitHub Packages. Skipping publish."
           else
@@ -99,14 +100,15 @@ jobs:
 
       - name: Determine dist-tag & publish to public NPM
         run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$VERSION" =~ -(beta|alpha|rc|canary) ]] || [[ "${{ github.ref }}" =~ refs/heads/release ]]; then
             TAG="beta"
           else
             TAG="latest"
           fi
-          echo "Checking if @dotevolve/doc-forge@$VERSION already exists on public npm..."
-          EXISTS_NPM=$(npm view "@dotevolve/doc-forge@${VERSION}" version --registry=https://registry.npmjs.org 2>/dev/null || true)
+          echo "Checking if $PACKAGE_NAME@$VERSION already exists on public npm..."
+          EXISTS_NPM=$(npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://registry.npmjs.org 2>/dev/null || true)
           if [ "$EXISTS_NPM" = "$VERSION" ]; then
             echo "Version $VERSION is already published to public npm. Skipping publish."
           else
