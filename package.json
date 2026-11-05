@@ -4,7 +4,7 @@
   "engines": {
     "node": "26.x"
   },
-  "description": "DocForge: Pure declarative document and print rendering engine",
+  "description": "DocForge: Pure declarative document and print rendering engine.",
   "license": "MPL-2.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

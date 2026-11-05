@@ -39,6 +39,7 @@ Thumbs.db
 .idea/
 .kiro/
 .vscode/
+.config.kiro
 *.suo
 *.ntvs*
 *.njsproj
