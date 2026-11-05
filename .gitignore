@@ -23,9 +23,8 @@ config.env
 *.env.bak
 *.env.backup
 
-# Explicitly Keep Config Templates & Package Registries
+# Explicitly Keep Config Templates
 !.env.example
-!.npmrc
 
 # Logs & Runtime
 logs
