@@ -28,3 +28,5 @@ export * from './PrintModalContext';
 export * from './DocumentPreviewModal';
 export { DocumentPreviewModal as ReportPreviewModal } from './DocumentPreviewModal';
 export type { DocumentPreviewModalProps as ReportPreviewModalProps } from './DocumentPreviewModal';
+export * from './DocumentStudio';
+export { DocumentStudio as DocForgeStudio } from './DocumentStudio';
