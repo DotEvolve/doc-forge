@@ -8,6 +8,13 @@ updates:
     target-branch: dev
     open-pull-requests-limit: 5
 
+  - package-ecosystem: npm
+    directory: /demo
+    schedule:
+      interval: weekly
+    target-branch: dev
+    open-pull-requests-limit: 5
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
