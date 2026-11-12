@@ -2,11 +2,13 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, 'release/**', master]
-    types: [opened, synchronize, reopened, ready_for_review]
+    branches: ['release/**', master]
+    types: [opened, reopened, ready_for_review]
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - '.kiro/**'
+      - '.husky/**'
       - '.github/dependabot.yml'
       - '.gitignore'
       - 'LICENSE'
@@ -15,6 +17,8 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - '.kiro/**'
+      - '.husky/**'
       - '.github/dependabot.yml'
       - '.gitignore'
       - 'LICENSE'
@@ -29,8 +33,7 @@ jobs:
     name: Build, Lint & Test
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: >-
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     permissions:
       contents: read
       packages: read
