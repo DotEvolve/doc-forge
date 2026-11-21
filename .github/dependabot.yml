@@ -4,20 +4,27 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     target-branch: dev
     open-pull-requests-limit: 5
+    groups:
+      npm-updates:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
 
   - package-ecosystem: npm
     directory: /demo
     schedule:
-      interval: weekly
+      interval: monthly
     target-branch: dev
     open-pull-requests-limit: 5
-
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-    target-branch: dev
-    open-pull-requests-limit: 5
+    groups:
+      npm-updates:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
