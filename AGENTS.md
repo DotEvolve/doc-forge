@@ -31,18 +31,24 @@ Strict branch flow:
 
 > **Absolute Rule**: Never commit directly to `dev` or `master`. All updates to `dev` and `master` require a Pull Request. Creating and pushing a `release/<calver>` branch directly from `dev` is the authorized method for staging release candidates; any subsequent fixes to that release branch must be merged via PR.
 
+### 3.1 Focused Feature PR Rule (Individual & Discrete PRs)
+
+> **Rule**: Features, enhancements, bug fixes, and chores should be developed on dedicated branches and opened as individual, focused PRs targeting `dev`. Opening separate PRs per feature or fix is encouraged to ensure isolated risk, granular automated testing, and concise code reviews.
+>
+> **Batching Disallowed**: Monolithic PRs bundling multiple unrelated features, fixes, or chores together are discouraged. Each distinct change should be delivered through its own discrete PR.
+
 ### The Promotion Lifecycle:
 
 1. **Feature Phase (`feature/*` -> `dev`)**:
    - Branch off `dev`: `git checkout dev && git pull origin dev && git checkout -b feat/<name>`.
    - Implement, verify locally, commit, and push: `git push -u origin feat/<name>`.
-   - Open PR targeting `dev`: `gh pr create --base dev --head feat/<name> ...`.
+   - Open PR targeting `dev`: `gh pr create --base dev --head feat/<name> ...` (merge using **Squash Merge**).
 2. **Release Candidate Phase (`dev` -> `release/<calver>`)**:
    - Pull updated `dev`: `git checkout dev && git pull origin dev`.
    - Branch using CalVer format `YYYY.0M.0D`: `git checkout -b release/YYYY.0M.0D` (append `.1`, `.2` for multiple daily releases).
    - Verify full test suite passes on the release branch.
    - Push release branch to origin: `git push -u origin release/YYYY.0M.0D`.
-   - Open PR targeting `master`: `gh pr create --base master --head release/YYYY.0M.0D --title "release: YYYY.0M.0D [dev -> master]" ...`.
+   - Open PR targeting `master`: `gh pr create --base master --head release/YYYY.0M.0D --title "release: YYYY.0M.0D [dev -> master]" ...` (merge using **Merge Commit**).
 
 ---
 
@@ -78,15 +84,24 @@ Even when all CI checks and Seer reviews pass with zero open comments:
   > _"PR #<id> has passed all CI checks and Seer code review with zero open comments. Do you approve merging this PR into `<target-branch>`?"_
 - Only when the user responds with explicit confirmation may the agent run the merge command.
 
-### Merge Strategy:
+### Merge Strategy by Phase:
 
-Always merge using **Squash Merge**:
+- **[Phase 1: Feature -> dev]** Use **SQUASH MERGE** (`--squash`):
 
-```bash
-gh pr merge <pr-number> --squash --delete-branch
-```
+  ```bash
+  gh pr merge <pr-number> --squash --delete-branch
+  ```
+  - Keeps `dev` clean, 1 commit per consolidated feature/fix.
 
-Rebase and merge commits are strictly prohibited.
+- **[Phase 2: release -> master]** Use **MERGE COMMIT** (`--merge` / `--no-ff`):
+  ```bash
+  gh pr merge <pr-number> --merge --delete-branch
+  ```
+  - Keeps exact `dev` commit SHAs in `master`'s git tree.
+  - Ensures `dev` and `master` never diverge.
+  - Releases are cleanly tagged at the merge commit.
+
+> **Rule**: Rebase merges (`--rebase`) are strictly prohibited.
 
 ---
 
@@ -129,7 +144,55 @@ The `package.json` version must be bumped prior to opening the release PR. If th
 
 ---
 
-## 7. Multi-Repository Platform Deployment Order
+## 7. Agent Decision & Confirmation Protocol
+
+### 7.1 Confirm Before Acting
+
+When the next action is unclear, the agent **must stop and ask** before proceeding. Never guess.
+
+Situations requiring explicit confirmation:
+
+- Which branch to target when ambiguous.
+- Whether to proceed with a breaking API change or version bump type.
+- Whether a found issue is in scope for the current task.
+- Modifying, creating, or deleting any GitHub Actions workflow files (`.github/workflows/*`).
+- Connecting to remote servers (dev or prod) via SSH, remote Docker, or direct shell.
+- Modifying standardized configuration files (e.g., `tsconfig*.json`, `package.json` scripts/engines, `.eslintrc*`, `eslint.config.*`, `.prettierrc*`, `vite.config.*`).
+
+> **Rule**: A short clarifying question is always preferable to an incorrect autonomous action.
+
+### 7.2 No Guessing Root Causes
+
+When investigating a bug or failure, **do not assume a cause without evidence**.
+
+- Read the actual error output or failing test first.
+- If evidence is not accessible, ask: _"Can you share the output of `<command>` so I can confirm the root cause?"_
+- Only propose a fix after the cause is confirmed by observable output.
+
+### 7.3 Standardized Configuration Protection Rule
+
+All configuration files for this library have been standardized (including `"types": ["node"]` and `"lib": ["ES2024"]` in `tsconfig*.json`, `package.json` engines/scripts, prettier, and eslint configs).
+
+- Agents **must not** modify, override, or revert standardized configuration files without explicit user permission.
+- If a dependency update, build failure, or new tooling requirement appears to necessitate altering compiler options, `types`, `lib`, scripts, or build targets, the agent **must halt and request explicit approval** before modifying any configuration file.
+
+### 7.4 GitHub Actions Workflow Protection Rule
+
+Agents **must not** modify, create, rename, or delete any GitHub Actions workflow files (`.github/workflows/*`) or CI/CD configuration files under any circumstances without prior explicit user authorization.
+
+### 7.5 Remote Server Access Restriction Rule
+
+Agents **must never** connect to remote development or production servers (via SSH, remote Docker socket/daemon, or direct host shell) without explicit user authorization. All infrastructure inspection, remote log viewing, container management, or host-level troubleshooting requires prior explicit permission from the user.
+
+---
+
+## 8. Artifact & Documentation Persistence
+
+All plans, analysis reports, architecture designs, and specifications generated by agents must be saved into documentation within this repository (in `docs/` or root-level markdown files).
+
+---
+
+## 9. Multi-Repository Platform Deployment Order
 
 When a task spans multiple repositories, execution and deployment must strictly follow this dependency chain:
 
