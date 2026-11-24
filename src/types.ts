@@ -1,8 +1,5 @@
 /**
- * DocForge: Declarative Document & Print Engine — Core Types
- *
- * Designed to be 100% portable to @dotevolve/doc-forge.
- * Contains zero imports from floorix-specific models or endpoints.
+ * DocForge: Declarative Document & Print Engine — Core Types.
  */
 
 export type ReportCellValue = string | number | boolean | null;
